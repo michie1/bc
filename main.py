@@ -7,7 +7,7 @@ import json
 
 from config import *
 from wtos import load_orders
-from google import write_spreadsheet
+from google import *
 
 POST_BC = False
 READ_WTOS = False
@@ -22,7 +22,7 @@ if READ_WTOS:
     exit()
 
 if POST_GOOGLE:
-    write_spreadsheet()
+    wks = load_spreadsheet()
     exit()
 
 
