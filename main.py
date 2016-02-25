@@ -5,36 +5,26 @@ import lxml.html
 from lxml import etree
 import json
 
-import config
+from config import *
+from wtos import load_orders
+from google import write_spreadsheet
 
-article_url = 'https://www.bike-components.de/en/Shimano/105-Kette-CN-HG600-11-11-fach-p39998/'
-
-account_url = 'https://www.bike-components.de/account.php'
-
-cookies = dict(
-emos_jcvid='AVK3q3ZiXniOmjZcV*0SojAiGDIm2JfJ:10:AVL1J4q5oqlZLoFDhr4wal9pELZvAdak:1455811955384:0:true:1',
-emos_best_products='39998:39998:39998:39998:47768',
-emos_jcsid='AVL1J4q5oqlZLoFDhr4wal9pELZvAdak:56:AVL1LLLA5Coau_wkWtuZy3ZzVIz9zT54:1455812293312'
-)
-
-#r = requests.get(article_url)
-#r = requests.get(account_url, cookies=cookies)
-
-#print r.text
-#print r.text.find('Hello')
-
-#print r.cookies
-
-log_file = open("text.html", "w")
-
+POST_BC = False
+READ_WTOS = False
+POST_GOOGLE = True
 
 s = requests.Session()
-#r = s.post(login_submit_url, verify=False)
 print 'Session started'
-#print r.cookies
-#print s.cookies
-#print r.cookies
-#print r.text.find('acceptance of Cookies')
+
+if READ_WTOS:
+    load_orders()
+    print 'Orders loaded'
+    exit()
+
+if POST_GOOGLE:
+    write_spreadsheet()
+    exit()
+
 
 topic_url = 'http://www.wtos.nl/prikbord/index.php?topic=6126.msg78335;topicseen#new'
 
@@ -55,11 +45,6 @@ post_html = 'BC105<br />2x <a href="https://www.bike-components.de/en/Shimano/Ul
 order_number = post_html[2:5]
 print 'BC' + order_number
 
-#product_url = 'https://www.bike-components.de/en/Shimano/Ultegra-XT-E-Bike-Kette-CN-HG701-11-11-fach-Modell-2016-p44481/'
-#product_type = ''
-
-
-
 r = s.get('https://www.bike-components.de/en/')
 r = s.get('https://www.bike-components.de/login.php')
 
@@ -76,6 +61,7 @@ r = s.post('https://www.bike-components.de/login.php?action=process',
      })
 
 if r.text.find('Your shopping cart contains') == -1:
+    print 'Not logged in'
     exit()
 print 'Logged in'
 
@@ -115,15 +101,16 @@ for p in post_html.split('<br />')[1:]:
         print product_url + ' ' + product_type + ' failed'
         exit()
 
-    r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
-        'products_id': product_id, 
-        'id[1]': product_type_id,
-        'products_qty': product_qty
-        })
+    if POST_BC:
+        r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
+            'products_id': product_id, 
+            'id[1]': product_type_id,
+            'products_qty': product_qty
+            })
 
-    if json.loads(r.text)['action'] != 'ok':
-        print product_id + ' ' + product_type_id + ' failed'
-        exit()
+        if json.loads(r.text)['action'] != 'ok':
+            print product_id + ' ' + product_type_id + ' failed'
+            exit()
 
     price_sum += product_qty * product_price
     print product_name + ' ' + product_type + ' ' + str(product_qty) + ' ' + str(product_price)
@@ -131,4 +118,4 @@ for p in post_html.split('<br />')[1:]:
 print 'Products placed in shopping cart'
 print 'Price sum: ' + str(price_sum)
 
-log_file.close()
+#log_file.close()
