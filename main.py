@@ -8,31 +8,26 @@ import json
 from config import *
 from wtos import load_orders
 from google import *
+from bc import *
 
 POST_BC = False
-READ_WTOS = False
-POST_GOOGLE = True
+READ_WTOS = True
+POST_SPREADSHEET = False
 
 s = requests.Session()
 print 'Session started'
 
-if READ_WTOS:
-    load_orders()
-    print 'Orders loaded'
-    exit()
-
-if POST_GOOGLE:
-    wks = load_spreadsheet()
-    exit()
 
 
-topic_url = 'http://www.wtos.nl/prikbord/index.php?topic=6126.msg78335;topicseen#new'
+login(s)
 
-t = requests.get(topic_url)
-doc = lxml.html.document_fromstring(t.text)
-print 'Topic loaded'
-last_post = doc.cssselect('[class=post]')[-2][0]
-print 'Last post loaded'
+#topic_url = 'http://www.wtos.nl/prikbord/index.php?topic=6126.msg78335;topicseen#new'
+
+#t = requests.get(topic_url)
+#doc = lxml.html.document_fromstring(t.text)
+#print 'Topic loaded'
+#last_post = doc.cssselect('[class=post]')[-2][0]
+#print 'Last post loaded'
 
 #order_number = last_post[0].text_content()
 #print 'Order number loaded'
@@ -40,32 +35,13 @@ print 'Last post loaded'
 #product_url = last_post[3].get('href')
 #print product_url
 
-post_html = 'BC105<br />2x <a href="https://www.bike-components.de/en/Shimano/Ultegra-FC-CX70-105-Innenlager-SM-BBR60-Hollowtech-II-p35878/" class="bbc_link" target="_blank">https://www.bike-components.de/en/Shimano/Ultegra-FC-CX70-105-Innenlager-SM-BBR60-Hollowtech-II-p35878/</a> schwarz/BSA<br />1x</strong> <a href="https://www.bike-components.de/en/BBB/RaceRibbon-BHT-01-Korklenkerband-p5064/" class="bbc_link" target="_blank">https://www.bike-components.de/en/BBB/RaceRibbon-BHT-01-Korklenkerband-p5064/</a> schwarz/BHT-01'
+#post_html = 'BC105<br />2x <a href="https://www.bike-components.de/en/Shimano/Ultegra-FC-CX70-105-Innenlager-SM-BBR60-Hollowtech-II-p35878/" class="bbc_link" target="_blank">https://www.bike-components.de/en/Shimano/Ultegra-FC-CX70-105-Innenlager-SM-BBR60-Hollowtech-II-p35878/</a> schwarz/BSA<br />1x</strong> <a href="https://www.bike-components.de/en/BBB/RaceRibbon-BHT-01-Korklenkerband-p5064/" class="bbc_link" target="_blank">https://www.bike-components.de/en/BBB/RaceRibbon-BHT-01-Korklenkerband-p5064/</a> schwarz/BHT-01'
 
-order_number = post_html[2:5]
-print 'BC' + order_number
+#order_number = post_html[2:5]
+#print 'BC' + order_number
 
-r = s.get('https://www.bike-components.de/en/')
-r = s.get('https://www.bike-components.de/login.php')
 
-doc = lxml.html.document_fromstring(r.text)
-token = doc.cssselect('input[name="__token"]')[0].value
-print 'Token retrieved: ', token
 
-r = s.post('https://www.bike-components.de/login.php?action=process',
-    data = {
-        'email_address': email,
-        'password': password,
-        '__intention': 'login',
-        '__token': token
-     })
-
-if r.text.find('Your shopping cart contains') == -1:
-    print 'Not logged in'
-    exit()
-print 'Logged in'
-
-price_sum = 0.0
 
 #product_url = 'https://www.bike-components.de/en/Shimano/Ultegra-Kassette-CS-6700-10-fach-p22072/'
 #product_type = 'silber/11-29'
@@ -74,39 +50,42 @@ price_sum = 0.0
 #product_type = ''
 #product_qty = '1'
 
-for p in post_html.split('<br />')[1:]:
+# moet naar wtos.py
+if False:
+    price_sum = 0.0
+    for p in post_html.split('<br />')[1:]:
 #for p in post_html.split('<br />')[1:2]:
-    product_qty = int(p.split('x')[0])
-    product_type = p.split('</a> ')[-1]
-    product_url = p.split('href=\"')[1].split('"')[0]
+        product_qty = int(p.split('x')[0])
+        product_type = p.split('</a> ')[-1]
+        product_url = p.split('href=\"')[1].split('"')[0]
 
-    #print product_qty, product_url, product_type
-    r = s.get(product_url)
-    doc = lxml.html.document_fromstring(r.text)
+        #print product_qty, product_url, product_type
+        r = s.get(product_url)
+        doc = lxml.html.document_fromstring(r.text)
 
-    try:
-        product_id = doc.cssselect('[name="products_id"]')[0].get('value')
-        
-        if product_type != '':
-            product_type_id = doc.cssselect('[data-selectedtext="' + product_type + '"]')[0].get('value')
+        try:
+            product_id = doc.cssselect('[name="products_id"]')[0].get('value')
+            
+            if product_type != '':
+                product_type_id = doc.cssselect('[data-selectedtext="' + product_type + '"]')[0].get('value')
 
-        else:
-            product_type = doc.cssselect('[data-selectedtext]')[0].get('data-selectedtext')
-            product_type_id = doc.cssselect('[data-selectedtext]')[0].get('value')
+            else:
+                product_type = doc.cssselect('[data-selectedtext]')[0].get('data-selectedtext')
+                product_type_id = doc.cssselect('[data-selectedtext]')[0].get('value')
 
-        product_name = doc.cssselect('title')[0].text.strip(' - bike-components')
-        product_price = float(doc.cssselect('[data-selectedtext="' + product_type + '"]')[0].text_content().split(' | ')[1][0:-1].replace(',', '.'))
+            product_name = doc.cssselect('title')[0].text.strip(' - bike-components')
+            product_price = float(doc.cssselect('[data-selectedtext="' + product_type + '"]')[0].text_content().split(' | ')[1][0:-1].replace(',', '.'))
 
-    except IndexError as e:
-        print product_url + ' ' + product_type + ' failed'
-        exit()
+        except IndexError as e:
+            print product_url + ' ' + product_type + ' failed'
+            exit()
 
-    if POST_BC:
-        r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
-            'products_id': product_id, 
-            'id[1]': product_type_id,
-            'products_qty': product_qty
-            })
+        if POST_BC:
+            r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
+                'products_id': product_id, 
+                'id[1]': product_type_id,
+                'products_qty': product_qty
+                })
 
         if json.loads(r.text)['action'] != 'ok':
             print product_id + ' ' + product_type_id + ' failed'
@@ -115,7 +94,22 @@ for p in post_html.split('<br />')[1:]:
     price_sum += product_qty * product_price
     print product_name + ' ' + product_type + ' ' + str(product_qty) + ' ' + str(product_price)
 
-print 'Products placed in shopping cart'
-print 'Price sum: ' + str(price_sum)
+    print 'Products placed in shopping cart'
+    print 'Price sum: ' + str(price_sum)
 
-#log_file.close()
+# Load orders from WTOS
+orders = load_orders()
+print 'Orders loaded'
+
+# Add to bc cart
+orders = add_cart(s, orders)
+print 'Orders added to cart'
+
+# Load and reset spreadsheet
+wks = load_spreadsheet()
+print 'Spreadsheet loaded'
+
+# Add to Google Spreadsheet
+add_spreadsheet(orders)
+
+print 'Finished'

@@ -10,8 +10,14 @@ def load_spreadsheet():
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
-    wks = sh.worksheet('105_cart')
-    print 'Spreadsheet loaded'
+
+    # delete worksheet
+    sh.del_worksheet(sh.worksheet('105_cart'))
+
+    # make worksheet
+    wks = sh.add_worksheet(title="105_cart", rows='100', cols='10')
+    #wks = sh.worksheet('105_cart')
+
     
     header = wks.range('A1:E1')
     header[0].value = 'besteller'
@@ -23,8 +29,10 @@ def load_spreadsheet():
 
     return wks
 
-def insert_article():
-    print 'insert article in spreadsheet'
+def add_spreadsheet(orders):
+    print orders
+
+    print 'Orders added to spreadsheet'
 
 def write_summary():
     print 'write summary'
