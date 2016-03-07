@@ -32,7 +32,7 @@ def get_product_data(s, product):
 
     try:
         data['id'] = doc.cssselect('[name="products_id"]')[0].get('value')
-        data['name'] = doc.cssselect('title')[0].text.strip(' - bike-components')
+        data['name'] = doc.cssselect('title')[0].text.strip(' - bike-components').strip('buy online')
         data['qty'] = product['qty']
 
         # get type id
@@ -82,5 +82,6 @@ def add_cart(s, orders):
             orders[user][pi]['price'] = data['price']
             orders[user][pi]['name'] = data['name']
             orders[user][pi]['type'] = data['type']
+        print 'Order ' + user + ' added to cart'
 
     return orders

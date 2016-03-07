@@ -39,8 +39,9 @@ def load_orders(bc_number):
                             'qty': int(product_qty),
                             'PA': ''
                         })
+                    print 'Order ' + poster_name + ' loaded'
+                        #print post[3]
 
-                #print html
             #html = post.items()[3][1]
             #print html
             #print post.items()
@@ -49,7 +50,6 @@ def load_orders(bc_number):
     #topic_id = recent_post.items()[6][1].items()[1][1]
     #print topic_id
 
-    #print orders
     return orders
 
 def load_orders_test(number):
