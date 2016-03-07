@@ -18,9 +18,6 @@ s = requests.Session()
 print 'Session started'
 
 
-
-login(s)
-
 #topic_url = 'http://www.wtos.nl/prikbord/index.php?topic=6126.msg78335;topicseen#new'
 
 #t = requests.get(topic_url)
@@ -97,8 +94,13 @@ if False:
     print 'Products placed in shopping cart'
     print 'Price sum: ' + str(price_sum)
 
+# Login to BC
+#login(s)
+
+bc_number = '106'
+
 # Load orders from WTOS
-orders = load_orders()
+orders = load_orders(bc_number)
 print 'Orders loaded'
 
 # Add to bc cart

@@ -25,8 +25,8 @@ def login(s):
 
 # Retrieve data about product in order to POST
 def get_product_data(s, product):
-
     data = {}
+
     r = s.get(product['url'])
     doc = lxml.html.document_fromstring(r.text)
 
@@ -51,7 +51,9 @@ def get_product_data(s, product):
         return data
 
     except IndexError as e:
-        print product['url'] + ' ' + data['type'] + ' failed'
+        print data
+        print e
+        #print product['url'] + ' ' + data['type'] + ' failed'
         exit()
 
 # Add a product to the cart
