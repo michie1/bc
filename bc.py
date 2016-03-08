@@ -84,6 +84,11 @@ def add_product(s, product):
 
     return data
 
+# add price alert voucher
+def add_pa(s):
+    #[{"type":"message","data":{"title":"The voucher code 9X86JPTZ has already been used in an order.","message":"Please contact our service team for questions or problems.","type":"type-error"}},{"type":"replace_components","data":[]}]
+    return True
+
 # Add all orders to the cart
 # and add extra data 
 def add_cart(s, orders):

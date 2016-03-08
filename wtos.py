@@ -32,12 +32,25 @@ def load_orders(bc_number):
                     for line in lines:
                         product_qty, product = line.split('x ', 1)
                         product_url = product[9:].split('"')[0]
-                        product_type = product.split('</a>')[1].strip()
+                        #product_type = product.split('</a>')[1].strip()
+                            
+                        # Divide type  and pa
+                        type_pa = product.split('</a>')[1].strip()
+                        strong = type_pa.split('<strong>')
+
+                        # PA exists
+                        if len(strong) == 2:
+                            product_type = strong[0].strip()
+                            product_pa = strong[1].strip('</strong>').strip()
+                        else:
+                            product_type = type_pa 
+                            product_pa = ''
+
                         orders[poster_name].append({
                             'url': product_url,
                             'type': product_type,
                             'qty': int(product_qty),
-                            'PA': ''
+                            'PA': product_pa
                         })
                     print 'Order ' + poster_name + ' loaded'
                         #print post[3]
@@ -49,6 +62,8 @@ def load_orders(bc_number):
 
     #topic_id = recent_post.items()[6][1].items()[1][1]
     #print topic_id
+
+    print orders
 
     return orders
 

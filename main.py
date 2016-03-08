@@ -103,6 +103,8 @@ bc_number = '106'
 orders = load_orders(bc_number)
 print 'Orders loaded'
 
+exit()
+
 # Add to bc cart
 orders = add_cart(s, orders)
 #print orders
