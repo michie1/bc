@@ -95,20 +95,20 @@ if False:
     print 'Price sum: ' + str(price_sum)
 
 # Login to BC
-#login(s)
+login(s)
 
 bc_number = '106'
 
 # Load orders from WTOS
-#orders = load_orders(bc_number)
+orders = load_orders(bc_number)
 print 'Orders loaded'
 
 # Add to bc cart
-#orders = add_cart(s, orders)
+orders = add_cart(s, orders)
 #print orders
 print 'Orders added to cart'
 
-orders = json.loads('{"Michiel91": [{"name": "FSA Auspresswerkzeug EE0019 fu00fcr BB30", "url": "https://www.bike-components.de/en/FSA/Auspresswerkzeug-EE0019-fuer-BB30-p21648/", "price": 4.58, "qty": 1, "PA": "", "type": "silber/universal"}, {"name": "FSA Einpresswerkzeug EE041 fu00fcr BB30", "url": "https://www.bike-components.de/en/FSA/Einpresswerkzeug-EE041-fuer-BB30-p21646/", "price": 7.07, "qty": 1, "PA": "", "type": "silber/universal"}, {"name": "Shimano Bremszug Rennrad", "url": "https://www.bike-components.de/en/Shimano/Bremszug-Rennrad-p1083/", "price": 1.98, "qty": 3, "PA": "", "type": "universal/universal"}]}')
+#orders = json.loads('{"Michiel91": [{"name": "FSA Auspresswerkzeug EE0019 fu00fcr BB30", "url": "https://www.bike-components.de/en/FSA/Auspresswerkzeug-EE0019-fuer-BB30-p21648/", "price": 4.58, "qty": 1, "PA": "", "type": "silber/universal"}, {"name": "FSA Einpresswerkzeug EE041 fu00fcr BB30", "url": "https://www.bike-components.de/en/FSA/Einpresswerkzeug-EE041-fuer-BB30-p21646/", "price": 7.07, "qty": 1, "PA": "", "type": "silber/universal"}, {"name": "Shimano Bremszug Rennrad", "url": "https://www.bike-components.de/en/Shimano/Bremszug-Rennrad-p1083/", "price": 1.98, "qty": 3, "PA": "", "type": "universal/universal"}]}')
 
 #print json.dumps(orders)
 # Load and reset spreadsheet

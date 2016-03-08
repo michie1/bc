@@ -31,6 +31,7 @@ def get_product_data(s, product):
     doc = lxml.html.document_fromstring(r.text)
 
     try:
+
         data['id'] = doc.cssselect('[name="products_id"]')[0].get('value')
         data['name'] = doc.cssselect('title')[0].text.strip(' - bike-components').strip('buy online')
         data['qty'] = product['qty']
@@ -45,6 +46,17 @@ def get_product_data(s, product):
             data['type'] = doc.cssselect('[data-selectedtext]')[0].get('data-selectedtext')
             data['type_id'] = doc.cssselect('[data-selectedtext]')[0].get('value')
 
+       
+        # get type index based on item type
+        type_index = 0
+        for meta in doc.cssselect('li span[itemprop="name"]'):
+            if meta.text == data['type']:
+                break
+            else:
+                type_index += 1
+
+        # get sku based on type index
+        data['sku'] = doc.cssselect('meta[itemprop="sku"]')[type_index].get('content') 
 
         data['price'] = float(doc.cssselect('[data-selectedtext="' + data['type'] + '"]')[0].text_content().split(' | ')[1][0:-1].replace(',', '.'))
 
@@ -82,6 +94,7 @@ def add_cart(s, orders):
             orders[user][pi]['price'] = data['price']
             orders[user][pi]['name'] = data['name']
             orders[user][pi]['type'] = data['type']
+            orders[user][pi]['sku'] = data['sku']
         print 'Order ' + user + ' added to cart'
 
     return orders
