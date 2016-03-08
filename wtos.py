@@ -50,7 +50,7 @@ def load_orders(bc_number):
                             'url': product_url,
                             'type': product_type,
                             'qty': int(product_qty),
-                            'PA': product_pa
+                            'pa': product_pa
                         })
                     print 'Order ' + poster_name + ' loaded'
                         #print post[3]

@@ -35,6 +35,7 @@ def get_product_data(s, product):
         data['id'] = doc.cssselect('[name="products_id"]')[0].get('value')
         data['name'] = doc.cssselect('title')[0].text.strip(' - bike-components').strip('buy online')
         data['qty'] = product['qty']
+        data['pa'] = product['pa']
 
         # get type id
         if product['type'] != '':
@@ -97,6 +98,8 @@ def add_cart(s, orders):
         for pi, product in enumerate(products):
             data = add_product(s, product)
             orders[user][pi]['price'] = data['price']
+            orders[user][pi]['original_price'] = data['price']
+            orders[user][pi]['pa'] = data['pa']
             orders[user][pi]['name'] = data['name']
             orders[user][pi]['type'] = data['type']
             orders[user][pi]['sku'] = data['sku']
