@@ -51,14 +51,17 @@ def add_to_spreadsheet(wks, orders):
             row[5].value = product['original_price']
             row[6].value = product['price']
             row[7].value = product['qty']
-            row[8].value = float(product['price']) * product['qty']
-            row[9].value = math.ceil(float(row[5].value) * 0.95 * 100) / 100
+            row[8].value = "=G" + str(row_number) + "*H" + str(row_number)
+            row[9].value = "=CEILING(I" + str(row_number) + "*0.95, 0.01)"
+            #row[8].value = float(product['price']) * product['qty']
+            #row[9].value = math.ceil(float(row[5].value) * 0.95 * 100) / 100
 
             wks.update_cells(row)
             row_number += 1
         last_row = row_number - 1
         wks.update_cell(row_number, 9, '=SUM(I' + str(first_row) + ':I' + str(last_row) + ')')
-        wks.update_cell(row_number, 10, '=CEILING(I' + str(row_number) + '*0.95, 0.01)')
+        #wks.update_cell(row_number, 10, '=CEILING(I' + str(row_number) + '*0.95, 0.01)')
+        wks.update_cell(row_number, 10, '=SUM(J' + str(first_row) + ':J' + str(last_row) + ')')
         row_number += 2
         print user + ' in spreadsheet'
 

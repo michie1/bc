@@ -63,7 +63,7 @@ def load_orders(bc_number):
     #topic_id = recent_post.items()[6][1].items()[1][1]
     #print topic_id
 
-    print orders
+    #print orders
 
     return orders
 

@@ -73,22 +73,110 @@ def get_product_data(s, product):
 def add_product(s, product):
     data = get_product_data(s, product)
 
-    r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
-        'products_id': data['id'], 
-        'id[1]': data['type_id'],
-        'products_qty': data['qty']
-        })
+    if False:
+        r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
+            'products_id': data['id'], 
+            'id[1]': data['type_id'],
+            'products_qty': data['qty']
+            })
 
-    if json.loads(r.text)['action'] != 'ok':
-        print product_id + ' ' + product_type_id + ' failed'
-        exit()
+        if json.loads(r.text)['action'] != 'ok':
+            print product_id + ' ' + product_type_id + ' failed'
+            exit()
 
     return data
 
 # add price alert voucher
-def add_pa(s):
+def add_pa(s, orders):
     #[{"type":"message","data":{"title":"The voucher code 9X86JPTZ has already been used in an order.","message":"Please contact our service team for questions or problems.","type":"type-error"}},{"type":"replace_components","data":[]}]
-    return True
+
+    """
+    r = s.get('https://www.bike-components.de/en/checkout/login/')
+    print r.text.encode('utf-8')
+    doc = lxml.html.document_fromstring(r.text)
+    profile_token = doc.cssselect('#complete_profile__token')[0].get('value')
+
+    # billing information
+
+    r = s.post('https://www.bike-components.de/en/checkout/login/',
+            data = {
+    'complete_profile[shipping][shipping_type]': 'billing_address',
+    'complete_profile[_token]': profile_token,
+    'submit': ''
+                }
+            )
+
+    # payment information 
+
+    doc = lxml.html.document_fromstring(r.text)
+    payment_token = doc.cssselect('#payment__token')[0].get('value')
+
+    r = s.post('https://www.bike-components.de/en/checkout/payment/',
+            data = {
+    'payment[type]': 'prepayment',
+    'payment[_token]': payment_token,
+    'payment[submit]': ''
+                }
+            )
+
+    """
+
+    r = s.get('https://www.bike-components.de/en/checkout/finalize/')
+    doc = lxml.html.document_fromstring(r.text)
+    voucher_token = doc.cssselect('#voucher__token')[0].get('value')
+    print 'voucher_token: ', voucher_token
+
+    # adding price alerts
+
+    for user, products in orders.iteritems():
+        for pid, product in enumerate(products):
+            if product['pa'] != '':
+                print product['pa']
+                product['pa'] = 'CAKEVPZS'
+
+                #r = s.post('https://www.bike-components.de/en/checkout/api/',
+                r = s.post('https://www.bike-components.de/en/checkout/finalize/',
+                        data = {
+                            #'actions[0][type]': 'add_voucher',
+                            #'actions[0][parameters][voucher_code]': product['pa'],
+                            #'actions[1][type]': 'render_all',
+                            'voucher[voucher_code]': product['pa'],
+                            'voucher[_token]': voucher_token,
+                            #'_token': 'e868698615adaad6042d3ec7e480c6933d1e260e'
+                            }
+                        )
+#_token=e868698615adaad6042d3ec7e480c6933d1e260e
+#actions[0][parameters][voucher_code]=khkjh
+#actions[0][type]=add_voucher
+#actions[1][type]=render_all
+
+                doc = lxml.html.document_fromstring(r.text)
+                #voucher_token = doc.cssselect('#voucher__token')[0].get('value')
+                #print 'voucher_token: ', voucher_token
+                #print r.text.encode('utf-8')
+                
+                pa_price = doc.cssselect('div.row [data-voucher-code="' + product['pa'] + '"]')[0].getparent().getparent().getparent().cssselect('.price-single .value.discounted')[0].text.strip().replace(',', '.')[0:-1]
+
+                #orders[user][pid]['pa_price'] = pa_price
+                product['price'] = pa_price
+
+                #print r.json()
+
+                #r = s.get('https://www.bike-components.de/shopping_cart.php?language=en')
+                #r = s.post('https://www.bike-components.de/en/checkout/login/')
+                #r = s.get('https://www.bike-components.de/en/checkout/finalize/')
+                #r = s.get('https://www.bike-components.de/shopping_cart.php?language=en')
+
+                #r = s.post('https://www.bike-components.de/en/checkout/api/',
+                        #data = {'actions': [{'type': 'add_voucher', 'parameters':{'voucher_code':'hoi'}}, {'type': 'render_all'}], '_token': })
+                #token = r.text.split('csrf_token')
+                #print 'token' in r.text
+                #print 'finalize' in r.text
+                #print r.text
+                #print token
+                #print r.text.encode('utf-8')
+
+    return orders
 
 # Add all orders to the cart
 # and add extra data 
@@ -99,6 +187,7 @@ def add_cart(s, orders):
             data = add_product(s, product)
             orders[user][pi]['price'] = data['price']
             orders[user][pi]['original_price'] = data['price']
+            orders[user][pi]['price'] = data['price']
             orders[user][pi]['pa'] = data['pa']
             orders[user][pi]['name'] = data['name']
             orders[user][pi]['type'] = data['type']
