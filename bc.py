@@ -209,5 +209,15 @@ def add_cart(s, orders):
     return orders
 
 def clear_cart(s):
+    
+    # Get cart
+    r = s.get('https://www.bike-components.de/shopping_cart.php')
+    doc = lxml.html.document_fromstring(r.text)
+ 
+    for product in doc.cssselect('input[name="products_id[]"]'):
+        r = s.post('https://www.bike-components.de/callback/cart_update.php',
+            data = {
+                'cart_delete[]': product.get('value'),
+                'products_id[]products_id': product.get('value')
+            })
 
-    print 'Cart cleared'

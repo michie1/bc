@@ -103,10 +103,9 @@ bc_number = '1234'
 orders = load_orders(bc_number)
 print 'Orders loaded'
 
-print orders
-
 # First clear cart
 clear_cart(s)
+print 'Cart cleared'
 
 # Add to bc cart
 orders = add_cart(s, orders)
