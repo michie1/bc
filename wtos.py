@@ -35,7 +35,13 @@ def load_orders(bc_number):
                             if line == '---':
                                 break
                             else:
-                                product_qty, product = line.split('x ', 1)
+                                try:
+                                    product_qty, product = line.split('x ', 1)
+                                except ValueError as e:
+                                    print 'Error'
+                                    print e
+                                    continue
+
                                 if int(product_qty) > 0:
                                     product_url = product[9:].split('"')[0]
                                     #product_type = product.split('</a>')[1].strip()
@@ -47,7 +53,7 @@ def load_orders(bc_number):
                                     # type and PA exists
                                     if len(strong) == 2:
                                         product_type = strong[0].strip()
-                                        product_pa = strong[1].strip('</strong>').strip()
+                                        product_pa = strong[1].replace('</strong>', '').strip()
                                     else:
                                         # type or PA exist
                                         if type_pa[0:8] == "<strong>":

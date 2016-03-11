@@ -65,7 +65,7 @@ def get_product_data(s, product):
         # get sku based on type index
         data['sku'] = doc.cssselect('meta[itemprop="sku"]')[type_index].get('content') 
 
-        data['price'] = float(doc.cssselect('[data-selectedtext]')[type_index].get('data-price')[0:-1].replace(',', '.'))
+        data['price'] = float(doc.cssselect('[data-selectedtext]')[type_index].get('data-price')[0:-1].replace('.', '').replace(',', '.'))
 
         return data
 
