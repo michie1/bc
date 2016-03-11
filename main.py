@@ -97,11 +97,14 @@ if False:
 # Login to BC
 login(s)
 
-bc_number = '106'
+bc_number = '1234'
 
 # Load orders from WTOS
 orders = load_orders(bc_number)
 print 'Orders loaded'
+
+# First clear cart
+clear_cart(s)
 
 # Add to bc cart
 orders = add_cart(s, orders)
@@ -116,10 +119,10 @@ orders = add_pa(s, orders)
 print 'Price alerts added'
 
 # Load and reset spreadsheet
-wks = load_spreadsheet()
+wks = load_spreadsheet(bc_number)
 print 'Spreadsheet loaded'
 
 # Add to Google Spreadsheet
 add_to_spreadsheet(wks, orders)
-
+    
 print 'Finished'

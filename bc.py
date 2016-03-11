@@ -32,34 +32,40 @@ def get_product_data(s, product):
 
     try:
 
+        #.strip('buy online')
         data['id'] = doc.cssselect('[name="products_id"]')[0].get('value')
-        data['name'] = doc.cssselect('title')[0].text.strip(' - bike-components').strip('buy online')
+        data['name'] = doc.cssselect('title')[0].text.replace(' - bike-components', '').replace('buy online', '')
         data['qty'] = product['qty']
         data['pa'] = product['pa']
 
-        # get type id
-        if product['type'] != '':
-            data['type'] = product['type']
-            data['type_id'] = doc.cssselect('[data-selectedtext="' + data['type'] + '"]')[0].get('value')
 
-        else:
+
+
+        if product['type'] == '':
             # get default type
+            type_index = 0
             data['type'] = doc.cssselect('[data-selectedtext]')[0].get('data-selectedtext')
             data['type_id'] = doc.cssselect('[data-selectedtext]')[0].get('value')
+        else:
+            # get specific type
+            data['type'] = product['type']
 
-       
-        # get type index based on item type
-        type_index = 0
-        for meta in doc.cssselect('li span[itemprop="name"]'):
-            if meta.text == data['type']:
-                break
-            else:
-                type_index += 1
+            # get type index based on item type
+            type_index = 0
+            for meta in doc.cssselect('li span[itemprop="name"]'):
+                if meta.text == product['type']:
+                    break
+                else:
+                    type_index += 1
+
+            # get type_id
+            data['type_id'] = doc.cssselect('[data-selectedtext]')[type_index].get('value')
+
 
         # get sku based on type index
         data['sku'] = doc.cssselect('meta[itemprop="sku"]')[type_index].get('content') 
 
-        data['price'] = float(doc.cssselect('[data-selectedtext="' + data['type'] + '"]')[0].text_content().split(' | ')[1][0:-1].replace(',', '.'))
+        data['price'] = float(doc.cssselect('[data-selectedtext]')[type_index].get('data-price')[0:-1].replace(',', '.'))
 
         return data
 
@@ -73,7 +79,7 @@ def get_product_data(s, product):
 def add_product(s, product):
     data = get_product_data(s, product)
 
-    if False:
+    if True:
         r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
             'products_id': data['id'], 
             'id[1]': data['type_id'],
@@ -122,17 +128,19 @@ def add_pa(s, orders):
     """
 
     r = s.get('https://www.bike-components.de/en/checkout/finalize/')
+    #print r.text.encode('utf-8')
+    #exit()
     doc = lxml.html.document_fromstring(r.text)
     voucher_token = doc.cssselect('#voucher__token')[0].get('value')
-    print 'voucher_token: ', voucher_token
+    print 'voucher_token retrieved: ', voucher_token
 
     # adding price alerts
 
     for user, products in orders.iteritems():
         for pid, product in enumerate(products):
             if product['pa'] != '':
-                print product['pa']
-                product['pa'] = 'CAKEVPZS'
+                #print product['pa']
+                #product['pa'] = 'CAKEVPZS'
 
                 #r = s.post('https://www.bike-components.de/en/checkout/api/',
                 r = s.post('https://www.bike-components.de/en/checkout/finalize/',
@@ -155,10 +163,14 @@ def add_pa(s, orders):
                 #print 'voucher_token: ', voucher_token
                 #print r.text.encode('utf-8')
                 
-                pa_price = doc.cssselect('div.row [data-voucher-code="' + product['pa'] + '"]')[0].getparent().getparent().getparent().cssselect('.price-single .value.discounted')[0].text.strip().replace(',', '.')[0:-1]
+                try:
+                    pa_price = doc.cssselect('div.row [data-voucher-code="' + product['pa'] + '"]')[0].getparent().getparent().getparent().cssselect('.price-single .value.discounted')[0].text.strip().replace(',', '.')[0:-1]
+                    product['price'] = pa_price
+                except IndexError as e:
+                    print 'Something wrong with price alert: ' + product['pa']
+                    print e
 
                 #orders[user][pid]['pa_price'] = pa_price
-                product['price'] = pa_price
 
                 #print r.json()
 
@@ -195,3 +207,7 @@ def add_cart(s, orders):
         print 'Order ' + user + ' added to cart'
 
     return orders
+
+def clear_cart(s):
+
+    print 'Cart cleared'

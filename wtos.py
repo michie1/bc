@@ -12,7 +12,7 @@ def load_orders(bc_number):
 
     orders = {}
 
-    file = urllib2.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=35;board=5.0')
+    file = urllib2.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=30;board=5.0')
     data = file.read()
     file.close()
     print 'Posts loaded'
@@ -22,36 +22,49 @@ def load_orders(bc_number):
     for post_obj in xml.items()[0][1:][0].items()[3][1]:
         post = post_obj.values()
         topic_id = post[6].values()[1]
-        if topic_id == '6126':
+        if topic_id == '6317':
             #doc = lxml.html.document_fromstring(html)
-            if post[1] == '78403':
-                if post[3][2:5] == str(bc_number):
+            if True or post[1] == '78403':
+                #if post[3][2:5] == str(bc_number):
+                if post[3][2:6] == str(bc_number): # want BC1234
                     poster_name = post[5].values()[0]
                     orders[poster_name] = []
                     lines = post[3].split('<br />')[1:]
                     for line in lines:
-                        product_qty, product = line.split('x ', 1)
-                        product_url = product[9:].split('"')[0]
-                        #product_type = product.split('</a>')[1].strip()
-                            
-                        # Divide type  and pa
-                        type_pa = product.split('</a>')[1].strip()
-                        strong = type_pa.split('<strong>')
+                        if line != '':
+                            if line == '---':
+                                break
+                            else:
+                                product_qty, product = line.split('x ', 1)
+                                if int(product_qty) > 0:
+                                    product_url = product[9:].split('"')[0]
+                                    #product_type = product.split('</a>')[1].strip()
+                                        
+                                    # Divide type  and pa
+                                    type_pa = product.split('</a>')[1].strip()
+                                    strong = type_pa.split('<strong>')
 
-                        # PA exists
-                        if len(strong) == 2:
-                            product_type = strong[0].strip()
-                            product_pa = strong[1].strip('</strong>').strip()
-                        else:
-                            product_type = type_pa 
-                            product_pa = ''
+                                    # type and PA exists
+                                    if len(strong) == 2:
+                                        product_type = strong[0].strip()
+                                        product_pa = strong[1].strip('</strong>').strip()
+                                    else:
+                                        # type or PA exist
+                                        if type_pa[0:8] == "<strong>":
+                                            # PA
+                                            product_pa = type_pa[8:-9]
+                                            product_type = ''
+                                        else:
+                                            # type
+                                            product_type = type_pa 
+                                            product_pa = ''
 
-                        orders[poster_name].append({
-                            'url': product_url,
-                            'type': product_type,
-                            'qty': int(product_qty),
-                            'pa': product_pa
-                        })
+                                    orders[poster_name].append({
+                                        'url': product_url,
+                                        'type': product_type,
+                                        'qty': int(product_qty),
+                                        'pa': product_pa
+                                    })
                     print 'Order ' + poster_name + ' loaded'
                         #print post[3]
 

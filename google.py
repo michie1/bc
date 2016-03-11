@@ -2,9 +2,10 @@ import json
 import gspread
 import math
 from oauth2client.service_account import ServiceAccountCredentials
+import time
 
 
-def load_spreadsheet():
+def load_spreadsheet(bc_number):
     print 'Load Google credentials'
     json_key = json.load(open('credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
@@ -13,12 +14,18 @@ def load_spreadsheet():
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
 
-    # delete worksheet
-    sh.del_worksheet(sh.worksheet('BC105'))
+    sh.worksheets() # problem if this is removed
+    sh.add_worksheet(title='0', rows='1', cols='1')
 
+    # delete worksheet
+    sh.del_worksheet(sh.worksheet("BC" + str(bc_number)))
+    
     # make worksheet
-    wks = sh.add_worksheet(title="BC105", rows='100', cols='10')
+    wks = sh.add_worksheet(title='BC' + str(bc_number), rows='200', cols='10')
     #wks = sh.worksheet('105_cart')
+
+    sh.del_worksheet(sh.worksheet('0'))
+
     
     header = wks.range('A1:J1')
     #header[0].value = 'besteller'
@@ -63,10 +70,7 @@ def add_to_spreadsheet(wks, orders):
         #wks.update_cell(row_number, 10, '=CEILING(I' + str(row_number) + '*0.95, 0.01)')
         wks.update_cell(row_number, 10, '=SUM(J' + str(first_row) + ':J' + str(last_row) + ')')
         row_number += 2
-        print user + ' in spreadsheet'
-
-
-
+        print 'Order ' + user + ' in spreadsheet'
 
     print 'Orders added to spreadsheet'
 
