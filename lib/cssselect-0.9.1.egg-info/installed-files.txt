@@ -1,0 +1,13 @@
+../cssselect/tests.py
+../cssselect/__init__.py
+../cssselect/parser.py
+../cssselect/xpath.py
+../cssselect/tests.pyc
+../cssselect/__init__.pyc
+../cssselect/parser.pyc
+../cssselect/xpath.pyc
+./
+top_level.txt
+PKG-INFO
+SOURCES.txt
+dependency_links.txt

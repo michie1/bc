@@ -4,7 +4,8 @@ import lxml.html
 #import untangle
 import xmltodict
 import urllib2
-import pprint
+
+from google.appengine.api import memcache
 
 def load_orders(bc_number):
     #obj = untangle.parse('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=100;board=5.0')
@@ -118,6 +119,26 @@ def load_orders_test(number):
         }
     return orders
 
+def has_new_post():
+    file = urllib2.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=10;board=5.0')
+    data = file.read()
+    file.close()
 
+    latest_post_id = -1 # None found in last 10 posts
+    xml = xmltodict.parse(data)
+    for post_obj in xml.items()[0][1:][0].items()[3][1]:
+        post = post_obj.values()
+        topic_id = post[6].values()[1]
+        if topic_id == '6317':
+            latest_post_id = post[1]
+            break
 
+    if latest_post_id == -1:
+        return False
 
+    
+    if latest_post_id != memcache.get("latest_post_id"):
+        memcache.set("latest_post_id", latest_post_id)
+        return True
+
+    return False
