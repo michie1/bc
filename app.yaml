@@ -37,4 +37,4 @@ libraries:
   - name: ssl
     version: latest
 
-version: 1
+version: 2

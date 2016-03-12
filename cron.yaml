@@ -1,0 +1,6 @@
+cron:
+  - url: /check
+    schedule: every 1 mins
+  - url:  /go
+    schedule: every 1 hours
+   

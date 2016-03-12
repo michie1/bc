@@ -10,7 +10,7 @@ import json
 
 from config import *
 from wtos import load_orders, has_new_post
-from google import *
+from ss import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
 
@@ -53,16 +53,18 @@ def go():
 
     print 'Finished'
 
-@app.route('/')
-def hello():
-    """Return a friendly HTTP greeting."""
+@app.route('/check')
+def check_route():
     if has_new_post():
         go()
         return "Updated"
     else:
         return "Nothing to do"
 
-
+@app.route('/go')
+def go_route():
+    go()
+    return "Updated"
 
 @app.errorhandler(404)
 def page_not_found(e):
