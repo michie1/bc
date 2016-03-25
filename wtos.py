@@ -23,7 +23,7 @@ def load_orders(bc_number):
     for post_obj in xml.items()[0][1:][0].items()[3][1]:
         post = post_obj.values()
         topic_id = post[6].values()[1]
-        if topic_id == '6317':
+        if topic_id == '6335':
             #doc = lxml.html.document_fromstring(html)
             if True or post[1] == '78403':
                 #if post[3][2:5] == str(bc_number):
