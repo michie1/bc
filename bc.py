@@ -131,7 +131,11 @@ def add_pa(s, orders):
     #print r.text.encode('utf-8')
     #exit()
     doc = lxml.html.document_fromstring(r.text)
-    voucher_token = doc.cssselect('#voucher__token')[0].get('value')
+    try:
+        voucher_token = doc.cssselect('#voucher__token')[0].get('value')
+    except IndexError as e:
+        print e
+        exit()
     print 'voucher_token retrieved: ', voucher_token
 
     # adding price alerts

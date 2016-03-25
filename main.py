@@ -33,25 +33,28 @@ def go():
     orders = load_orders(bc_number)
     print 'Orders loaded'
 
-    # First clear cart
-    clear_cart(s)
-    print 'Cart cleared'
+    if len(orders) > 0:
+        # First clear cart
+        clear_cart(s)
+        print 'Cart cleared'
 
-    # Add to bc cart
-    orders = add_cart(s, orders)
-    print 'Orders added to cart'
+        # Add to bc cart
+        orders = add_cart(s, orders)
+        print 'Orders added to cart'
 
-    orders = add_pa(s, orders)
-    print 'Price alerts added'
+        orders = add_pa(s, orders)
+        print 'Price alerts added'
 
-    # Load and reset spreadsheet
-    wks = load_spreadsheet(bc_number)
-    print 'Spreadsheet loaded'
+        # Load and reset spreadsheet
+        wks = load_spreadsheet(bc_number)
+        print 'Spreadsheet loaded'
 
-    # Add to Google Spreadsheet
-    add_to_spreadsheet(wks, orders)
+        # Add to Google Spreadsheet
+        add_to_spreadsheet(wks, orders)
 
-    print 'Finished'
+        print 'Finished'
+    else:
+        print 'No orders'
 
 @app.route('/check')
 def check_route():
