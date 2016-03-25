@@ -129,7 +129,7 @@ def has_new_post():
     for post_obj in xml.items()[0][1:][0].items()[3][1]:
         post = post_obj.values()
         topic_id = post[6].values()[1]
-        if topic_id == '78403':
+        if topic_id == '6335':
             latest_post_id = post[1]
             break
 
