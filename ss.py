@@ -17,8 +17,13 @@ def load_spreadsheet(bc_number):
     sh.worksheets() # problem if this is removed
     sh.add_worksheet(title='0', rows='1', cols='1')
 
-    # delete worksheet
-    sh.del_worksheet(sh.worksheet("BC" + str(bc_number)))
+
+    try:
+        # delete worksheet
+        sh.del_worksheet(sh.worksheet("BC" + str(bc_number)))
+    except gspread.exceptions.WorksheetNotFound as err:
+        print err
+        memcache.set("busy", "false")
     
     # make worksheet
     wks = sh.add_worksheet(title='BC' + str(bc_number), rows='200', cols='10')

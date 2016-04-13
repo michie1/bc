@@ -13,6 +13,7 @@ from wtos import load_orders, has_new_post
 from ss import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
+from google.appengine.api import memcache
 
 # Import the Flask Framework
 from flask import Flask
@@ -21,40 +22,49 @@ app = Flask(__name__)
 # the App Engine WSGI application server.
 
 def go():
-    s = requests.Session()
-    print 'Session started'
-
-    # Login to BC
-    login(s)
-
-    bc_number = '108'
-
-    # Load orders from WTOS
-    orders = load_orders(bc_number)
-    print 'Orders loaded'
-
-    if len(orders) > 0:
-        # First clear cart
-        clear_cart(s)
-        print 'Cart cleared'
-
-        # Add to bc cart
-        orders = add_cart(s, orders)
-        print 'Orders added to cart'
-
-        orders = add_pa(s, orders)
-        print 'Price alerts added'
-
-        # Load and reset spreadsheet
-        wks = load_spreadsheet(bc_number)
-        print 'Spreadsheet loaded'
-
-        # Add to Google Spreadsheet
-        add_to_spreadsheet(wks, orders)
-
-        print 'Finished'
+    
+    # Check if another instance is already busy
+    if memcache.get("busy"):
+        print "Already busy"
     else:
-        print 'No orders'
+        memcache.set("busy", "true")
+
+        s = requests.Session()
+        print 'Session started'
+
+        # Login to BC
+        login(s)
+
+        bc_number = '108'
+
+        # Load orders from WTOS
+        orders = load_orders(bc_number)
+        print 'Orders loaded'
+
+        if len(orders) > 0:
+            # First clear cart
+            clear_cart(s)
+            print 'Cart cleared'
+
+            # Add to bc cart
+            orders = add_cart(s, orders)
+            print 'Orders added to cart'
+
+            orders = add_pa(s, orders)
+            print 'Price alerts added'
+
+            # Load and reset spreadsheet
+            wks = load_spreadsheet(bc_number)
+            print 'Spreadsheet loaded'
+
+            # Add to Google Spreadsheet
+            add_to_spreadsheet(wks, orders)
+
+            print 'Finished'
+        else:
+            print 'No orders'
+        
+        memcache.set("busy", "false")
 
 @app.route('/check')
 def check_route():

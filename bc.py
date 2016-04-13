@@ -1,6 +1,7 @@
 import lxml.html
 import json
 from config import *
+from google.appengine.api import memcache
 
 def login(s):
     r = s.get('https://www.bike-components.de/en/')
@@ -131,11 +132,7 @@ def add_pa(s, orders):
     #print r.text.encode('utf-8')
     #exit()
     doc = lxml.html.document_fromstring(r.text)
-    try:
-        voucher_token = doc.cssselect('#voucher__token')[0].get('value')
-    except IndexError as e:
-        print e
-        exit()
+    voucher_token = doc.cssselect('#voucher__token')[0].get('value')
     print 'voucher_token retrieved: ', voucher_token
 
     # adding price alerts
