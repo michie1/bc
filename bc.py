@@ -1,7 +1,6 @@
 import lxml.html
 import json
 from config import *
-from google.appengine.api import memcache
 
 def login(s):
     r = s.get('https://www.bike-components.de/en/')

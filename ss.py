@@ -23,7 +23,7 @@ def load_spreadsheet(bc_number):
         sh.del_worksheet(sh.worksheet("BC" + str(bc_number)))
     except gspread.exceptions.WorksheetNotFound as err:
         print err
-        memcache.set("busy", "false")
+        memcache.set("busy", 0)
     
     # make worksheet
     wks = sh.add_worksheet(title='BC' + str(bc_number), rows='200', cols='10')
@@ -71,9 +71,14 @@ def add_to_spreadsheet(wks, orders):
             wks.update_cells(row)
             row_number += 1
         last_row = row_number - 1
-        wks.update_cell(row_number, 9, '=SUM(I' + str(first_row) + ':I' + str(last_row) + ')')
-        #wks.update_cell(row_number, 10, '=CEILING(I' + str(row_number) + '*0.95, 0.01)')
-        wks.update_cell(row_number, 10, '=SUM(J' + str(first_row) + ':J' + str(last_row) + ')')
+        try:
+            wks.update_cell(row_number, 9, '=SUM(I' + str(first_row) + ':I' + str(last_row) + ')')
+            #wks.update_cell(row_number, 10, '=CEILING(I' + str(row_number) + '*0.95, 0.01)')
+            wks.update_cell(row_number, 10, '=SUM(J' + str(first_row) + ':J' + str(last_row) + ')')
+        except ConnectionError as e:
+            print e
+            memcache.set("busy", 0)
+
         row_number += 2
         print 'Order ' + user + ' in spreadsheet'
 

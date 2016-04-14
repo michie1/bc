@@ -24,10 +24,10 @@ app = Flask(__name__)
 def go():
     
     # Check if another instance is already busy
-    if memcache.get("busy"):
+    if memcache.get("busy") == 1:
         print "Already busy"
     else:
-        memcache.set("busy", "true")
+        memcache.set("busy", 0)
 
         s = requests.Session()
         print 'Session started'
@@ -64,7 +64,7 @@ def go():
         else:
             print 'No orders'
         
-        memcache.set("busy", "false")
+        memcache.set("busy", 0)
 
 @app.route('/check')
 def check_route():
