@@ -45,33 +45,37 @@ def load_orders(bc_number):
 
                                 if int(product_qty) > 0:
                                     product_url = product[9:].split('"')[0]
-                                    #product_type = product.split('</a>')[1].strip()
-                                        
-                                    # Divide type  and pa
-                                    type_pa = product.split('</a>')[1].strip()
-                                    strong = type_pa.split('<strong>')
 
-                                    # type and PA exists
-                                    if len(strong) == 2:
-                                        product_type = strong[0].strip()
-                                        product_pa = strong[1].replace('</strong>', '').strip()
-                                    else:
-                                        # type or PA exist
-                                        if type_pa[0:8] == "<strong>":
-                                            # PA
-                                            product_pa = type_pa[8:-9]
-                                            product_type = ''
+                                    if 'bike-components.de' in product_url:
+                                        #product_type = product.split('</a>')[1].strip()
+                                            
+                                        # Divide type  and pa
+                                        type_pa = product.split('</a>')[1].strip()
+                                        strong = type_pa.split('<strong>')
+
+                                        # type and PA exists
+                                        if len(strong) == 2:
+                                            product_type = strong[0].strip()
+                                            product_pa = strong[1].replace('</strong>', '').strip()
                                         else:
-                                            # type
-                                            product_type = type_pa 
-                                            product_pa = ''
+                                            # type or PA exist
+                                            if type_pa[0:8] == "<strong>":
+                                                # PA
+                                                product_pa = type_pa[8:-9]
+                                                product_type = ''
+                                            else:
+                                                # type
+                                                product_type = type_pa 
+                                                product_pa = ''
 
-                                    orders[poster_name].append({
-                                        'url': product_url,
-                                        'type': product_type,
-                                        'qty': int(product_qty),
-                                        'pa': product_pa
-                                    })
+                                        orders[poster_name].append({
+                                            'url': product_url,
+                                            'type': product_type,
+                                            'qty': int(product_qty),
+                                            'pa': product_pa
+                                        })
+                                    else:
+                                        print 'Wrong url: ', product_url
                     print 'Order ' + poster_name + ' loaded'
                         #print post[3]
 
