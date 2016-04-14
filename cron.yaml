@@ -1,6 +1,6 @@
 cron:
   - url: /check
-    schedule: every 1 mins
+    schedule: every 5 mins
   - url:  /go
-    schedule: every 1 hours
+    schedule: every 2 hours
    
