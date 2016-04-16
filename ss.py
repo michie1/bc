@@ -75,12 +75,13 @@ def add_to_spreadsheet(wks, orders):
             wks.update_cell(row_number, 9, '=SUM(I' + str(first_row) + ':I' + str(last_row) + ')')
             #wks.update_cell(row_number, 10, '=CEILING(I' + str(row_number) + '*0.95, 0.01)')
             wks.update_cell(row_number, 10, '=SUM(J' + str(first_row) + ':J' + str(last_row) + ')')
-        except ConnectionError as e:
-            print e
+        except gspread.exceptions.ConnectionError as err:
+            print err
             memcache.set("busy", 0)
 
         row_number += 2
         print 'Order ' + user + ' in spreadsheet'
+        time.sleep(1)
 
     print 'Orders added to spreadsheet'
 

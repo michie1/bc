@@ -169,6 +169,7 @@ def add_pa(s, orders):
                 except IndexError as e:
                     print 'Something wrong with price alert: ' + product['pa']
                     print e
+            time.sleep(1)
 
                 #orders[user][pid]['pa_price'] = pa_price
 
