@@ -14,6 +14,8 @@ from ss import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
 from google.appengine.api import memcache
+from google.appengine.api import urlfetch
+urlfetch.set_default_fetch_deadline(60)
 
 # Import the Flask Framework
 from flask import Flask
@@ -24,10 +26,10 @@ app = Flask(__name__)
 def go():
     
     # Check if another instance is already busy
-    if memcache.get("busy") == 1:
+    if memcache.get("busy") == "1":
         print "Already busy"
     else:
-        memcache.set("busy", 0)
+        memcache.set("busy", "0")
 
         s = requests.Session()
         print 'Session started'
@@ -35,7 +37,7 @@ def go():
         # Login to BC
         login(s)
 
-        bc_number = '108'
+        bc_number = '109'
 
         # Load orders from WTOS
         orders = load_orders(bc_number)
@@ -64,7 +66,7 @@ def go():
         else:
             print 'No orders'
         
-        memcache.set("busy", 0)
+        memcache.set("busy", "0")
 
 @app.route('/check')
 def check_route():

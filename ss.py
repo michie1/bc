@@ -23,7 +23,7 @@ def load_spreadsheet(bc_number):
         sh.del_worksheet(sh.worksheet("BC" + str(bc_number)))
     except gspread.exceptions.WorksheetNotFound as err:
         print err
-        memcache.set("busy", 0)
+        memcache.set("busy", "0")
     
     # make worksheet
     wks = sh.add_worksheet(title='BC' + str(bc_number), rows='200', cols='10')
@@ -77,7 +77,7 @@ def add_to_spreadsheet(wks, orders):
             wks.update_cell(row_number, 10, '=SUM(J' + str(first_row) + ':J' + str(last_row) + ')')
         except gspread.exceptions.ConnectionError as err:
             print err
-            memcache.set("busy", 0)
+            memcache.set("busy", "0")
 
         row_number += 2
         print 'Order ' + user + ' in spreadsheet'

@@ -13,7 +13,8 @@ def load_orders(bc_number):
 
     orders = {}
 
-    file = urllib2.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=30;board=5.0')
+    # maybe need to increase 70 when there are more posts between two bestellingen
+    file = urllib2.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=70;board=5.0')
     data = file.read()
     file.close()
     print 'Posts loaded'
@@ -27,7 +28,7 @@ def load_orders(bc_number):
             #doc = lxml.html.document_fromstring(html)
             if True or post[1] == '78403':
                 #if post[3][2:5] == str(bc_number):
-                if post[3][2:5] == str(bc_number): # want BC1234
+                if post[3][2:5] == str(bc_number): # BC123
                     poster_name = post[5].values()[0]
                     orders[poster_name] = []
                     lines = post[3].split('<br />')[1:]
@@ -35,6 +36,8 @@ def load_orders(bc_number):
                         if line != '':
                             if line == '---':
                                 break
+                            elif line[0:5] == '<del>':
+                                continue
                             else:
                                 try:
                                     product_qty, product = line.split('x ', 1)
