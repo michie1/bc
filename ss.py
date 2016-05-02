@@ -51,7 +51,7 @@ def add_to_spreadsheet(wks, orders):
     row_number = 2
 
     for user, products in orders.iteritems():
-        wks.update_cell(row_number, 2, user)
+        wks.update_cell(row_number, 2, user.decode('utf-8'))
         row_number += 1
         first_row = row_number
         for product in products:

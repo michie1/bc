@@ -29,7 +29,7 @@ def load_orders(bc_number):
             if True or post[1] == '78403':
                 #if post[3][2:5] == str(bc_number):
                 if post[3][2:5] == str(bc_number): # BC123
-                    poster_name = post[5].values()[0]
+                    poster_name = post[5].values()[0].encode('utf-8')
                     orders[poster_name] = []
                     lines = post[3].split('<br />')[1:]
                     for line in lines:
