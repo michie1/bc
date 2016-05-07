@@ -4,3 +4,4 @@ credentials.json
 *.swp
 *.swo
 bcmux.bash
+venv
