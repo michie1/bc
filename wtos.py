@@ -30,7 +30,8 @@ def load_orders(bc_number):
                 #if post[3][2:5] == str(bc_number):
                 if post[3][2:5] == str(bc_number): # BC123
                     poster_name = post[5].values()[0].encode('utf-8')
-                    orders[poster_name] = []
+                    if poster_name not in orders:
+                        orders[poster_name] = []
                     lines = post[3].split('<br />')[1:]
                     for line in lines:
                         if line != '':
@@ -38,6 +39,9 @@ def load_orders(bc_number):
                                 break
                             elif line[0:5] == '<del>':
                                 continue
+                            elif line == 'WTOS' and poster_name == 'ThomasvantK':
+                                poster_name = 'WTOS'
+                                orders[poster_name] = []
                             else:
                                 try:
                                     product_qty, product = line.split('x ', 1)
