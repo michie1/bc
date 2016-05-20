@@ -39,18 +39,22 @@ def load_orders(bc_number):
                                 break
                             elif line[0:5] == '<del>':
                                 continue
-                            elif line == 'WTOS' and poster_name == 'ThomasvantK':
-                                poster_name = 'WTOS'
-                                orders[poster_name] = []
+                            elif line == 'WTOS':
+                                if poster_name == 'ThomasvantK':
+                                    poster_name = 'WTOS'
+                                    orders[poster_name] = []
+                                else:
+                                    break
                             else:
                                 try:
                                     product_qty, product = line.split('x ', 1)
+                                    product_qty = int(product_qty.strip())
                                 except ValueError as e:
                                     print 'Error'
                                     print e
                                     continue
 
-                                if int(product_qty) > 0:
+                                if product_qty > 0:
                                     product_url = product[9:].split('"')[0]
 
                                     if 'bike-components.de' in product_url:
@@ -78,7 +82,7 @@ def load_orders(bc_number):
                                         orders[poster_name].append({
                                             'url': product_url,
                                             'type': product_type,
-                                            'qty': int(product_qty),
+                                            'qty': product_qty,
                                             'pa': product_pa
                                         })
                                     else:

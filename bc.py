@@ -36,10 +36,8 @@ def get_product_data(s, product):
         #.strip('buy online')
         data['id'] = doc.cssselect('[name="products_id"]')[0].get('value')
         data['name'] = doc.cssselect('title')[0].text.replace(' - bike-components', '').replace('buy online', '')
-        data['qty'] = product['qty']
+        data['qty'] = str(product['qty'])
         data['pa'] = product['pa']
-
-
 
 
         if product['type'] == '':
