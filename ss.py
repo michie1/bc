@@ -55,8 +55,9 @@ def add_to_spreadsheet(wks, orders):
         row_number += 1
         first_row = row_number
         for product in products:
+            print product
             row = wks.range('A' + str(row_number) + ':J' + str(row_number))
-            row[0].value, row[1].value = product['name'].split(' ', 1)
+            row[0].value, row[1].value = product['name'].decode('utf-8').split(' ', 1)
             row[2].value = product['type']
             row[3].value = "=(\"" + product['sku'] + "\")"
             row[4].value = product['pa']
