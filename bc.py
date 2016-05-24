@@ -2,22 +2,34 @@ import lxml.html
 import json
 import time
 from config import *
+import pdb
 
 def login(s):
     r = s.get('https://www.bike-components.de/en/')
-    r = s.get('https://www.bike-components.de/login.php')
+    r = s.get('https://www.bike-components.de/en/login/')
 
     doc = lxml.html.document_fromstring(r.text)
-    token = doc.cssselect('input[name="__token"]')[0].value
+    # token = doc.cssselect('input[name="__token"]')[0].value
+    # pdb.set_trace()
+    token = doc.cssselect('input[name="module9200[login][_token]"]')[0].value
     print 'Token retrieved: ', token
 
-    r = s.post('https://www.bike-components.de/login.php?action=process',
+    r = s.post(
+    #'https://www.bike-components.de/login.php?action=process',
+    'https://www.bike-components.de/en/login/',
         data = {
-            'email_address': email,
-            'password': password,
-            '__intention': 'login',
-            '__token': token
+            #'email_address': email,
+            'module9200[login][email]': email,
+            'module9200[login][password]': password,
+            'module9200[login][_token]': token,
+            'module9200[login][submit]': ''
+            #'password': password,
+            # module9200[login][submit]
+            #'__intention': 'login',
+            #'__token': token
          })
+
+    #pdb.set_trace()
 
     if r.text.find('Your shopping cart contains') == -1:
         print 'Not logged in'
