@@ -10,7 +10,7 @@ import json
 
 from config import *
 from wtos import load_orders, has_new_post
-from ss import load_spreadsheet, add_to_spreadsheet
+from ss2 import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
 from google.appengine.api import memcache

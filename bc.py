@@ -2,7 +2,6 @@ import lxml.html
 import json
 import time
 from config import *
-import pdb
 
 def login(s):
     r = s.get('https://www.bike-components.de/en/')
@@ -43,6 +42,7 @@ def get_product_data(s, product):
     r = s.get(product['url'])
     doc = lxml.html.document_fromstring(r.text)
 
+    #product['type'] = product.replace('&quot;', '"')
 
     try:
 
@@ -74,6 +74,7 @@ def get_product_data(s, product):
             data['type'] = product['type']
 
             li = doc.cssselect('li[itemprop="offers"]')[type_index]
+            #print product['type'], li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1]
             while product['type'] != li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1]:
                 type_index += 1
                 li = doc.cssselect('li[itemprop="offers"]')[type_index]
@@ -261,11 +262,13 @@ def clear_cart(s):
     # Get cart
     r = s.get('https://www.bike-components.de/shopping_cart.php')
     doc = lxml.html.document_fromstring(r.text)
+    token = doc.cssselect('body')[0].get('data-csrf-token')
  
     for product in doc.cssselect('input[name="products_id[]"]'):
         r = s.post('https://www.bike-components.de/callback/cart_update.php',
             data = {
                 'cart_delete[]': product.get('value'),
-                'products_id[]products_id': product.get('value')
+                'products_id[]products_id': product.get('value'),
+                '_token': token
             })
 
