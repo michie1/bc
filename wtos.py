@@ -79,6 +79,9 @@ def load_orders(bc_number):
                                                 product_type = type_pa 
                                                 product_pa = ''
 
+                                        # fix for " in type
+                                        product_type = product_type.replace('&quot;', '"')
+
                                         orders[poster_name].append({
                                             'url': product_url,
                                             'type': product_type,
@@ -88,6 +91,7 @@ def load_orders(bc_number):
                                     else:
                                         print 'Wrong url: ', product_url
                     print 'Order ' + poster_name + ' loaded'
+                    #break
                         #print post[3]
 
             #html = post.items()[3][1]
