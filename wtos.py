@@ -80,7 +80,7 @@ def load_orders(bc_number):
                                                 product_pa = ''
 
                                         # fix for " in type
-                                        product_type = product_type.replace('&quot;', '"')
+                                        product_type = product_type.replace('&quot;', '"').replace('&nbsp;', '')
 
                                         orders[poster_name].append({
                                             'url': product_url,

@@ -54,7 +54,7 @@ def add_to_spreadsheet(wks, orders):
 
     #orders = sorted(orders)
 
-    cell_list = wks.range("A1:J%s" % 100)
+    cell_list = wks.range("A1:J%s" % 200)
     #print cell_list
     #pdb.set_trace()
 
@@ -81,7 +81,14 @@ def add_to_spreadsheet(wks, orders):
         first_row = row_number
 
         for product in products:
-            cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].decode('utf-8').split(' ', 1)
+            try:
+                cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].decode('utf-8').split(' ', 1)
+            except IndexError as e:
+                print e
+                print user, product
+                print product['type']
+                print row_number
+
             cell_list[row_number*10+2].value = product['type']
             cell_list[row_number*10+3].value = "=(\"" + product['sku'] + "\")"
             cell_list[row_number*10+4].value = product['pa']
