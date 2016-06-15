@@ -30,7 +30,7 @@ def login(s):
 
     #pdb.set_trace()
 
-    if r.text.find('Your shopping cart contains') == -1:
+    if r.text.find('Your shopping cart') == -1:
         print 'Not logged in'
         exit()
     print 'Logged in'
@@ -49,6 +49,7 @@ def get_product_data(s, product):
         #.strip('buy online')
         data['id'] = doc.cssselect('input[name="products_id"]')[0].get('value')
         data['name'] = doc.cssselect('title')[0].text.encode('utf-8').replace(' - bike-components', '').replace('buy online', '')
+        #print data['id'], data['name']
         data['qty'] = str(product['qty'])
         data['pa'] = product['pa']
 
@@ -113,16 +114,18 @@ def get_product_data(s, product):
         return data
 
     except IndexError as e:
+        print 'type does not exist?'
         print data
         print e
+        return None
         #print product['url'] + ' ' + data['type'] + ' failed'
-        exit()
+        # exit()
 
 # Add a product to the cart
 def add_product(s, product):
     data = get_product_data(s, product)
 
-    if True:
+    if data != None:
         r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
             'products_id': data['id'], 
             'id[1]': data['type_id'],
@@ -183,6 +186,9 @@ def add_pa(s, orders):
 
     for user, products in orders.iteritems():
         for pid, product in enumerate(products):
+            if product == None:
+                continue
+
             if product['pa'] != '':
                 #print product['pa']
                 #product['pa'] = 'CAKEVPZS'
@@ -246,13 +252,21 @@ def add_cart(s, orders):
                 #continue
 
             data = add_product(s, product)
-            orders[user][pi]['price'] = data['price']
-            orders[user][pi]['original_price'] = data['price']
-            orders[user][pi]['price'] = data['price']
-            orders[user][pi]['pa'] = data['pa']
-            orders[user][pi]['name'] = data['name']
-            orders[user][pi]['type'] = data['type']
-            orders[user][pi]['sku'] = data['sku']
+            if data != None:
+                orders[user][pi]['price'] = data['price']
+                orders[user][pi]['original_price'] = data['price']
+                orders[user][pi]['price'] = data['price']
+                orders[user][pi]['pa'] = data['pa']
+                orders[user][pi]['name'] = data['name']
+                orders[user][pi]['type'] = data['type']
+                orders[user][pi]['sku'] = data['sku']
+            else:
+                orders[user][pi] = None
+                #print pi
+                #print orders[user]
+                #exit()
+                #orders[user].pop(pi)
+
         print 'Order ' + user + ' added to cart'
 
     return orders

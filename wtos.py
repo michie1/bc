@@ -50,7 +50,7 @@ def load_orders(bc_number):
                                     product_qty, product = line.split('x ', 1)
                                     product_qty = int(product_qty.strip())
                                 except ValueError as e:
-                                    print 'Error'
+                                    print 'ValueError'
                                     print e
                                     continue
 
