@@ -13,8 +13,8 @@ def load_orders(bc_number):
 
     orders = {}
 
-    # maybe need to increase 70 when there are more posts between two bestellingen
-    file = urllib2.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=70;board=5.0')
+    # maybe need to increase 80 when there are more posts between two orders.
+    file = urllib2.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=80;board=5.0')
     data = file.read()
     file.close()
     print 'Posts loaded'

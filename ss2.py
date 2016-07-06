@@ -101,8 +101,11 @@ def add_to_spreadsheet(wks, orders):
             cell_list[row_number*10+2].value = product['type']
             cell_list[row_number*10+3].value = "=(\"" + product['sku'] + "\")"
             cell_list[row_number*10+4].value = product['pa']
+            
+            # todo ceiling
             cell_list[row_number*10+5].value = product['original_price']
             cell_list[row_number*10+6].value = product['price']
+
             cell_list[row_number*10+7].value = product['qty']
             cell_list[row_number*10+8].value = "=G" + str(row_number+1) + "*H" + str(row_number+1)
             cell_list[row_number*10+9].value = "=CEILING(I" + str(row_number+1) + "*0.95, 0.01)"
