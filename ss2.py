@@ -4,6 +4,7 @@ import math
 from oauth2client.service_account import ServiceAccountCredentials
 import time
 import pdb
+from google.appengine.api import memcache
 
 
 def load_spreadsheet(bc_number):
