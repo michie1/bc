@@ -73,9 +73,11 @@ def get_product_data(s, product):
         else:
             #print product['type']
             data['type'] = product['type']
+            #print data['type'].encode('utf-8')
 
             li = doc.cssselect('li[itemprop="offers"]')[type_index]
-            #print product['type'], li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1]
+            #print data['type'].encode('utf-8')
+            #print li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1].encode('utf-8')
             while product['type'] != li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1]:
                 type_index += 1
                 li = doc.cssselect('li[itemprop="offers"]')[type_index]
