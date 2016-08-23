@@ -37,7 +37,7 @@ def go():
         # Login to BC
         login(s)
 
-        bc_number = '114'
+        bc_number = '115'
 
         # Load orders from WTOS
         orders = load_orders(bc_number)
