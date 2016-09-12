@@ -11,7 +11,7 @@ def login(s):
     # token = doc.cssselect('input[name="__token"]')[0].value
     # pdb.set_trace()
     token = doc.cssselect('input[name="module9200[login][_token]"]')[0].value
-    print 'Token retrieved: ', token
+    print('Token retrieved: ', token)
 
     r = s.post(
     #'https://www.bike-components.de/login.php?action=process',
@@ -31,9 +31,9 @@ def login(s):
     #pdb.set_trace()
 
     if r.text.find('Your shopping cart') == -1:
-        print 'Not logged in'
+        print('Not logged in')
         exit()
-    print 'Logged in'
+    print('Logged in')
 
 # Retrieve data about product in order to POST
 def get_product_data(s, product):
@@ -116,9 +116,9 @@ def get_product_data(s, product):
         return data
 
     except IndexError as e:
-        print 'type does not exist?'
-        print data
-        print e
+        print('type does not exist?')
+        print(data)
+        print(e)
         return None
         #print product['url'] + ' ' + data['type'] + ' failed'
         # exit()
@@ -137,7 +137,7 @@ def add_product(s, product):
             })
 
         if json.loads(r.text)['action'] != 'ok':
-            print r.text
+            print(r.text)
             exit()
 
     return data
@@ -182,7 +182,7 @@ def add_pa(s, orders):
     #exit()
     doc = lxml.html.document_fromstring(r.text)
     voucher_token = doc.cssselect('#voucher__token')[0].get('value')
-    print 'voucher_token retrieved: ', voucher_token
+    print('voucher_token retrieved: ', voucher_token)
 
     # adding price alerts
 
@@ -220,8 +220,8 @@ def add_pa(s, orders):
                     pa_price = doc.cssselect('div.row [data-voucher-code="' + product['pa'] + '"]')[0].getparent().getparent().getparent().cssselect('.price-single .value.discounted')[0].text.strip().replace(',', '.')[0:-1]
                     product['price'] = pa_price
                 except IndexError as e:
-                    print 'Something wrong with price alert: ' + product['pa']
-                    print e
+                    print('Something wrong with price alert: ' + product['pa'])
+                    print(e)
             time.sleep(1)
 
                 #orders[user][pid]['pa_price'] = pa_price
@@ -269,7 +269,7 @@ def add_cart(s, orders):
                 #exit()
                 #orders[user].pop(pi)
 
-        print 'Order ' + user + ' added to cart'
+        print('Order ' + user + ' added to cart')
 
     return orders
 

@@ -4,11 +4,9 @@ import math
 from oauth2client.service_account import ServiceAccountCredentials
 import time
 import pdb
-from google.appengine.api import memcache
-
 
 def load_spreadsheet(bc_number):
-    print 'Load Google credentials'
+    print('Load Google credentials')
     json_key = json.load(open('credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
     credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
@@ -24,8 +22,7 @@ def load_spreadsheet(bc_number):
         # delete worksheet
         sh.del_worksheet(sh.worksheet("BC" + str(bc_number)))
     except gspread.exceptions.WorksheetNotFound as err:
-        print err
-        memcache.set("busy", "0")
+        print(err)
     
     # make worksheet
     wks = sh.add_worksheet(title='BC' + str(bc_number), rows='200', cols='10')
@@ -89,14 +86,14 @@ def add_to_spreadsheet(wks, orders):
             try:
                 cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].decode('utf-8').split(' ', 1)
             except IndexError as e:
-                print e
-                print user, product
-                print product['type']
-                print row_number
+                print(e)
+                print(user, product)
+                print(product['type'])
+                print(row_number)
                 continue
             except KeyError as e:
-                print e
-                print user, product
+                print(e)
+                print(user, product)
                 continue
 
             cell_list[row_number*10+2].value = product['type']
@@ -125,12 +122,12 @@ def add_to_spreadsheet(wks, orders):
             #memcache.set("busy", "0")
 
         row_number += 2
-        print 'Order ' + user + ' prepared for spreadsheet'
+        print('Order ' + user + ' prepared for spreadsheet')
         #time.sleep(1)
 
     wks.update_cells(cell_list)
 
-    print 'Orders added to spreadsheet'
+    print('Orders added to spreadsheet')
 
     #wks.update_cells(cell_list)
 

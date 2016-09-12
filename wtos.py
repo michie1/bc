@@ -3,9 +3,8 @@ import requests
 import lxml.html
 #import untangle
 import xmltodict
-import urllib2
+import urllib
 
-from google.appengine.api import memcache
 
 def load_orders(bc_number):
     #obj = untangle.parse('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=100;board=5.0')
@@ -14,10 +13,10 @@ def load_orders(bc_number):
     orders = {}
 
     # maybe need to increase 80 when there are more posts between two orders.
-    file = urllib2.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=80;board=5.0')
+    file = urllib.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=80;board=5.0')
     data = file.read()
     file.close()
-    print 'Posts loaded'
+    print('Posts loaded')
 
     xml = xmltodict.parse(data)
 
@@ -50,8 +49,8 @@ def load_orders(bc_number):
                                     product_qty, product = line.split('x ', 1)
                                     product_qty = int(product_qty.strip())
                                 except ValueError as e:
-                                    print 'ValueError'
-                                    print e
+                                    print('ValueError')
+                                    print(e)
                                     continue
 
                                 if product_qty > 0:
@@ -89,8 +88,8 @@ def load_orders(bc_number):
                                             'pa': product_pa
                                         })
                                     else:
-                                        print 'Wrong url: ', product_url
-                    print 'Order ' + poster_name + ' loaded'
+                                        print('Wrong url: ', product_url)
+                    print('Order ' + poster_name + ' loaded')
                     #break
                         #print post[3]
 
@@ -113,7 +112,7 @@ def load_orders_test(number):
     if False:
         t = requests.get(topic_url)
         doc = lxml.html.document_fromstring(t.text)
-        print 'Topic loaded'
+        print('Topic loaded')
         last_post = doc.cssselect('[class=post]')[-2][0]
 
     #print last_post.text_content()[0:5]
@@ -139,7 +138,7 @@ def load_orders_test(number):
     return orders
 
 def has_new_post():
-    file = urllib2.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=10;board=5.0')
+    file = urllib.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=10;board=5.0')
     data = file.read()
     file.close()
 
@@ -154,10 +153,5 @@ def has_new_post():
 
     if latest_post_id == -1:
         return False
-
-    
-    if latest_post_id != memcache.get("latest_post_id"):
-        memcache.set("latest_post_id", latest_post_id)
-        return True
 
     return False
