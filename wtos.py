@@ -3,7 +3,8 @@ import requests
 import lxml.html
 #import untangle
 import xmltodict
-import urllib
+from urllib.request import urlopen
+import json
 
 
 def load_orders(bc_number):
@@ -13,28 +14,33 @@ def load_orders(bc_number):
     orders = {}
 
     # maybe need to increase 80 when there are more posts between two orders.
-    file = urllib.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=80;board=5.0')
+    file = urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=80;board=5.0')
     data = file.read()
     file.close()
     print('Posts loaded')
 
     xml = xmltodict.parse(data)
 
-    for post_obj in xml.items()[0][1:][0].items()[3][1]:
-        post = post_obj.values()
-        topic_id = post[6].values()[1]
+    recent_posts = xml["smf:xml-feed"]['recent-post']
+
+    #for post_obj in xml.items()[0][1:][0].items()[3][1]:
+    for post_obj in recent_posts:
+        #import pdb; pdb.set_trace()
+        #post = post_obj.values()
+        #topic_id = post[6].values()[1]
+        topic_id = post_obj['topic']['id']
         if topic_id == '6335':
             #doc = lxml.html.document_fromstring(html)
-            if True or post[1] == '78403':
+            if True:
                 #if post[3][2:5] == str(bc_number):
-                if post[3][2:5] == str(bc_number): # BC123
-                    poster_name = post[5].values()[0].encode('utf-8')
+                if post_obj['body'][2:5] == str(bc_number): # BC123
+                    poster_name = post_obj['poster']['name']
                     if poster_name not in orders:
                         orders[poster_name] = []
-                    lines = post[3].split('<br />')[1:]
+                    lines = post_obj['body'].split('<br />')[1:]
                     for line in lines:
                         if line != '':
-                            if line == '---':
+                            if line == '---' or (line[0] == '-' and line[-1] == '-'):
                                 break
                             elif line[0:5] == '<del>':
                                 continue
@@ -51,6 +57,7 @@ def load_orders(bc_number):
                                 except ValueError as e:
                                     print('ValueError')
                                     print(e)
+                                    print(line)
                                     continue
 
                                 if product_qty > 0:
