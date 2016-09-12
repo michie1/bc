@@ -48,7 +48,8 @@ def get_product_data(s, product):
 
         #.strip('buy online')
         data['id'] = doc.cssselect('input[name="products_id"]')[0].get('value')
-        data['name'] = doc.cssselect('title')[0].text.encode('utf-8').replace(' - bike-components', '').replace('buy online', '')
+        #data['name'] = doc.cssselect('title')[0].text.encode('utf-8').replace(' - bike-components', '').replace('buy online', '') # does not work anymore in Python 3.5. Probably has to do something with encoding
+        data['name'] = doc.cssselect('title')[0].text.replace(' - bike-components', '').replace('buy online', '')
         #print data['id'], data['name']
         data['qty'] = str(product['qty'])
         data['pa'] = product['pa']
@@ -186,7 +187,7 @@ def add_pa(s, orders):
 
     # adding price alerts
 
-    for user, products in orders.iteritems():
+    for user, products in orders.items():
         for pid, product in enumerate(products):
             if product == None:
                 continue
@@ -247,7 +248,7 @@ def add_pa(s, orders):
 # Add all orders to the cart
 # and add extra data 
 def add_cart(s, orders):
-    for user, products in orders.iteritems():
+    for user, products in orders.items():
         #print user, order
         for pi, product in enumerate(products):
             #if product['url'] != 'https://www.bike-components.de/en/Procraft/Allround-II-MTB-Cage-Pedals-p13419/':
