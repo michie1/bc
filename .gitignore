@@ -5,3 +5,6 @@ credentials.json
 *.swo
 bcmux.bash
 venv
+CONTRIB.md
+LICENSE
+README.md
