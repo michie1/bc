@@ -7,9 +7,9 @@ import pdb
 
 def load_spreadsheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open('credentials.json'))
+    json_key = json.load(open('/home/pi/bc/credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('/home/pi/bc/credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
@@ -29,7 +29,6 @@ def load_spreadsheet(bc_number):
     #wks = sh.worksheet('105_cart')
 
     sh.del_worksheet(sh.worksheet('0'))
-
     
     """
     header = wks.range('A1:J1')
