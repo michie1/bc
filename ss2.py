@@ -51,7 +51,7 @@ def add_to_spreadsheet(wks, orders):
 
     #orders = sorted(orders)
 
-    cell_list = wks.range("A1:J%s" % 300)
+    cell_list = wks.range("A1:J%s" % 200)
     #print cell_list
     #pdb.set_trace()
 
@@ -128,9 +128,10 @@ def add_to_spreadsheet(wks, orders):
             print('Order ' + user + ' prepared for spreadsheet')
             #time.sleep(1)
 
-    for summary as user_sum:
+    for user_sum in summary:
         cell_list[row_number*10].value = user_sum[0]
         cell_list[row_number*10+1].value = user_sum[1]
+        row_number += 1
 
     wks.update_cells(cell_list)
 
