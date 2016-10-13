@@ -45,7 +45,7 @@ def load_orders(bc_number):
                             elif line[0:5] == '<del>':
                                 continue
                             elif line == 'WTOS':
-                                if poster_name == 'ThomasvantK':
+                                if poster_name == 'Tim van Rugge':
                                     poster_name = 'WTOS'
                                     orders[poster_name] = []
                                 else:
