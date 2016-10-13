@@ -51,7 +51,7 @@ def add_to_spreadsheet(wks, orders):
 
     #orders = sorted(orders)
 
-    cell_list = wks.range("A1:J%s" % 200)
+    cell_list = wks.range("A1:J%s" % 300)
     #print cell_list
     #pdb.set_trace()
 
@@ -70,9 +70,10 @@ def add_to_spreadsheet(wks, orders):
     #wks.update_cells(header)
     row_number += 1
 
+    summary = []
+    
     #for user, products in orders.iteritems():
     for user, products in sorted(orders.items()):
-
         if len(products) > 0:
             cell_list[row_number*10].value = user # no decode ni python 3.5
             row_number += 1
@@ -114,6 +115,8 @@ def add_to_spreadsheet(wks, orders):
             cell_list[row_number*10+8].value = '=SUM(I' + str(first_row+1) + ':I' + str(last_row+1) + ')'
             cell_list[row_number*10+9].value = '=SUM(J' + str(first_row+1) + ':J' + str(last_row+1) + ')'
 
+            summary.append((user, '=SUM(J' + str(first_row+1) + ':J' + str(last_row+1) + ')'))
+
             #try:
                 #cell_list[row_number+8].value = '=SUM(I' + str(first_row) + ':I' + str(last_row) + ')'
                 #cell_list[row_number+9].value = '=SUM(J' + str(first_row) + ':J' + str(last_row) + ')'
@@ -124,6 +127,10 @@ def add_to_spreadsheet(wks, orders):
             row_number += 2
             print('Order ' + user + ' prepared for spreadsheet')
             #time.sleep(1)
+
+    for summary as user_sum:
+        cell_list[row_number*10].value = user_sum[0]
+        cell_list[row_number*10+1].value = user_sum[1]
 
     wks.update_cells(cell_list)
 
