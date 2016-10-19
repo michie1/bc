@@ -40,11 +40,14 @@ def load_orders(bc_number):
                     lines = post_obj['body'].split('<br />')[1:]
                     for line in lines:
                         if line != '':
-                            if line == '---' or (line[0] == '-' and line[-1] == '-'):
+                            if line == '---':
                                 break
-                            elif line[0:4] == 'http':
-                                print 'Line starts with http in an item placed by ' + poster_name
-                            elif line[0:5] == '<del>':
+                            elif line[0] == '-' and line[-1] == '-':
+                                continue
+                            elif line[0:2] == '<a':
+                                line = '1x ' + line
+                            
+                            if line[0:5] == '<del>':
                                 continue
                             elif line == 'WTOS':
                                 if poster_name == 'Tim van Rugge':
