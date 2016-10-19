@@ -42,6 +42,8 @@ def load_orders(bc_number):
                         if line != '':
                             if line == '---' or (line[0] == '-' and line[-1] == '-'):
                                 break
+                            elif line[0:4] == 'http':
+                                print 'Line starts with http in an item placed by ' + poster_name
                             elif line[0:5] == '<del>':
                                 continue
                             elif line == 'WTOS':
