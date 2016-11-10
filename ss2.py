@@ -128,10 +128,28 @@ def add_to_spreadsheet(wks, orders):
             print('Order ' + user + ' prepared for spreadsheet')
             #time.sleep(1)
 
+    start_row_total_sum = row_number + 1
     for user_sum in summary:
         cell_list[row_number*10].value = user_sum[0]
         cell_list[row_number*10+1].value = user_sum[1]
         row_number += 1
+    end_row_total_sum = row_number
+
+    row_number += 1
+
+    cell_list[row_number*10].value = "Totaal"
+    cell_list[row_number*10+1].value = "=SUM(B" + str(start_row_total_sum) + ":B" + str(end_row_total_sum) + ")"
+    row_number += 1
+
+    cell_list[row_number*10].value = "zonder 5%"
+    cell_list[row_number*10+1].value = "=B" + str((row_number)) + "/0.95"
+    row_number += 1
+
+    cell_list[row_number*10].value = "Met porto"
+    cell_list[row_number*10+1].value = "=B" + str((row_number)) + "+5.95"
+    row_number += 1
+
+    
 
     wks.update_cells(cell_list)
 
