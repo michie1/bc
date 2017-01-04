@@ -19,6 +19,8 @@ def load_orders(bc_number):
     #obj = untangle.parse('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=100;board=5.0')
     #print obj.smf_xml_feed.recent_post[0].starter.name.cdata
 
+    bc_chef = 'Tim van Rugge'
+
     orders = {}
 
     # maybe need to increase 80 when there are more posts between two orders.
@@ -42,10 +44,12 @@ def load_orders(bc_number):
             if True:
                 #if post[3][2:5] == str(bc_number):
                 if post_obj['body'][2:11] == str(int(bc_number) + 1) + ' start': # next start
-                    increment_bc_number(int(bc_number) + 1)
-                    create_next_spreadsheet(int(bc_number) + 1)
-                    break
-                if post_obj['body'][2:11] == str(bc_number) + ' start': # current start
+                    poster_name = post_obj['poster']['name']
+                    if poster_name == bc_chef:
+                        increment_bc_number(int(bc_number) + 1)
+                        create_next_spreadsheet(int(bc_number) + 1)
+                        break
+                elif post_obj['body'][2:11] == str(bc_number) + ' start': # current start
                     break # ignore
                 elif post_obj['body'][2:5] == str(bc_number): # BC123 
                     poster_name = post_obj['poster']['name']
@@ -64,7 +68,7 @@ def load_orders(bc_number):
                             if line[0:5] == '<del>':
                                 continue
                             elif line == 'WTOS':
-                                if poster_name == 'Tim van Rugge':
+                                if poster_name == bc_chef:
                                     poster_name = 'WTOS'
                                     orders[poster_name] = []
                                 else:
