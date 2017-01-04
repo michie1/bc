@@ -6,6 +6,14 @@ import xmltodict
 from urllib.request import urlopen
 import json
 
+def increment_bc_number(number):
+    with open('bc_number.json', 'w') as fp:
+        data = {}
+        data['number'] = number
+        json.dump(data, fp)
+
+def create_next_spreadsheet(number):
+    print('TODO: increment_next_spreadsheet')
 
 def load_orders(bc_number):
     #obj = untangle.parse('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=100;board=5.0')
@@ -33,7 +41,13 @@ def load_orders(bc_number):
             #doc = lxml.html.document_fromstring(html)
             if True:
                 #if post[3][2:5] == str(bc_number):
-                if post_obj['body'][2:5] == str(bc_number): # BC123
+                if post_obj['body'][2:11] == str(int(bc_number) + 1) + ' start': # next start
+                    increment_bc_number(int(bc_number) + 1)
+                    create_next_spreadsheet(int(bc_number) + 1)
+                    break
+                if post_obj['body'][2:11] == str(bc_number) + ' start': # current start
+                    break # ignore
+                elif post_obj['body'][2:5] == str(bc_number): # BC123 
                     poster_name = post_obj['poster']['name']
                     if poster_name not in orders:
                         orders[poster_name] = []

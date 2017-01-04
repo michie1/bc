@@ -10,6 +10,12 @@ from wtos import load_orders, has_new_post
 from ss2 import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
+def read_bc_number():
+    with open('bc_number.json', 'r') as fp:
+        data = json.load(fp)
+        return data['number']
+
+
 def go():
     s = requests.Session()
     print('Session started')
@@ -17,7 +23,8 @@ def go():
     # Login to BC
     login(s)
 
-    bc_number = '123'
+    # bc_number = '123'
+    bc_number = str(read_bc_number())
 
     # Load orders from WTOS
     orders = load_orders(bc_number)
