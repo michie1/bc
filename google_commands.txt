@@ -1,3 +1,0 @@
-appcfg.py -A bike-components update app.yaml
-dev_appserver.py .
-appcfg.py -A bike-components update_cron app.yaml
