@@ -5,11 +5,23 @@ from oauth2client.service_account import ServiceAccountCredentials
 import time
 import pdb
 
+def create_sheet(bc_number):
+    print('Load Google credentials')
+    json_key = json.load(open('credentials.json'))
+    scope = ['https://spreadsheets.google.com/feeds']
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+
+    gc = gspread.authorize(credentials)
+    sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
+
+    sh.worksheets() # problem if this is removed
+    sh.add_worksheet(title='BC' + str(bc_number), rows='1', cols='1')
+
 def load_spreadsheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open('/home/pi/bc/credentials.json'))
+    json_key = json.load(open('credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('/home/pi/bc/credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
@@ -30,21 +42,6 @@ def load_spreadsheet(bc_number):
 
     sh.del_worksheet(sh.worksheet('0'))
     
-    """
-    header = wks.range('A1:J1')
-    #header[0].value = 'besteller'
-    #header[1].value = 'artikel'
-    #header[2].value = 'type'
-    #header[3].value = 'sku'
-    header[4].value = 'Price alert'
-    header[5].value = 'Originele prijs'
-    header[6].value = 'Prijs per stuk'
-    header[7].value = 'Aantal'
-    header[8].value = 'Totaal'
-    header[9].value = '5%'
-    wks.update_cells(header)
-    """
-
     return wks
 
 def add_to_spreadsheet(wks, orders):

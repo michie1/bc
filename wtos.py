@@ -5,15 +5,18 @@ import lxml.html
 import xmltodict
 from urllib.request import urlopen
 import json
+from ss2 import create_sheet
 
 def increment_bc_number(number):
+    print('increment bc number')
     with open('bc_number.json', 'w') as fp:
         data = {}
         data['number'] = number
         json.dump(data, fp)
 
-def create_next_spreadsheet(number):
-    print('TODO: increment_next_spreadsheet')
+def create_next_sheet(number):
+    print('create next sheet')
+    create_sheet(number)
 
 def load_orders(bc_number):
     #obj = untangle.parse('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=100;board=5.0')
@@ -47,7 +50,7 @@ def load_orders(bc_number):
                     poster_name = post_obj['poster']['name']
                     if poster_name == bc_chef:
                         increment_bc_number(int(bc_number) + 1)
-                        create_next_spreadsheet(int(bc_number) + 1)
+                        create_next_sheet(int(bc_number) + 1)
                         break
                 elif post_obj['body'][2:11] == str(bc_number) + ' start': # current start
                     break # ignore
