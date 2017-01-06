@@ -4,12 +4,13 @@ import math
 from oauth2client.service_account import ServiceAccountCredentials
 import time
 import pdb
+from config import directory
 
 def create_sheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open('credentials.json'))
+    json_key = json.load(open(directory + 'credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(directory + 'credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
@@ -19,9 +20,9 @@ def create_sheet(bc_number):
 
 def load_spreadsheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open('credentials.json'))
+    json_key = json.load(open(directory + 'credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(directory + 'credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
