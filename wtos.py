@@ -6,10 +6,11 @@ import xmltodict
 from urllib.request import urlopen
 import json
 from ss2 import create_sheet
+from config import *
 
 def increment_bc_number(number):
     print('increment bc number')
-    with open('bc_number.json', 'w') as fp:
+    with open(directory + 'bc_number.json', 'w') as fp:
         data = {}
         data['number'] = number
         json.dump(data, fp)
