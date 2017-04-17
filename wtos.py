@@ -23,7 +23,7 @@ def load_orders(bc_number):
     #obj = untangle.parse('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=100;board=5.0')
     #print obj.smf_xml_feed.recent_post[0].starter.name.cdata
 
-    bc_chef = 'Tim van Rugge'
+    bc_chef = 'Tim.'
 
     orders = {}
 
