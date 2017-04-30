@@ -97,6 +97,8 @@ def add_product(s, product):
 
     return data
 
+
+
 # add price alert voucher
 def add_pa(s, orders):
 
@@ -132,15 +134,25 @@ def add_pa(s, orders):
 
     return orders
 
+def remove_product(s, product_id, type_id):
+    r = s.get('https://www.bike-components.de/shopping_cart.php')
+    doc = lxml.html.document_fromstring(r.text)
+    token = doc.cssselect('body')[0].get('data-csrf-token')
+
+    r = s.post(
+        'https://www.bike-components.de/callback/cart_update.php',
+        data = {
+            'cart_delete[]': product_id + '-' + type_id,
+            'products_id[]products_id': product_id + '-' + type_id,
+            '_token': token
+        })
+
 # Add all orders to the cart
 # and add extra data 
 def add_cart(s, orders):
     for user, products in orders.items():
         #print user, order
         for pi, product in enumerate(products):
-            #if product['url'] != 'https://www.bike-components.de/en/Procraft/Allround-II-MTB-Cage-Pedals-p13419/':
-                #continue
-
             data = add_product(s, product)
             if data != None:
                 orders[user][pi]['price'] = data['price']
@@ -150,12 +162,14 @@ def add_cart(s, orders):
                 orders[user][pi]['name'] = data['name']
                 orders[user][pi]['type'] = data['type']
                 orders[user][pi]['sku'] = data['sku']
+                
+                # Remove price alert product from basket
+                if data['pa'] != '':
+                    print('Remove product ', data['id'], data['type_id'])
+                    remove_product(s, data['id'], data['type_id'])
             else:
                 orders[user][pi] = None
-                #print pi
-                #print orders[user]
-                #exit()
-                #orders[user].pop(pi)
+
 
         print('Order ' + user + ' added to cart')
 
