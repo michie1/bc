@@ -62,7 +62,7 @@ def load_orders(bc_number):
                     lines = post_obj['body'].split('<br />')[1:]
                     for line in lines:
                         if line != '':
-                            if line == '---':
+                            if line == '---' or line == '--':
                                 break
                             elif line[0] == '-' and line[-1] == '-':
                                 continue
