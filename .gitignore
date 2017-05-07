@@ -2,5 +2,5 @@ log.txt
 venv
 config.py
 credentials.json
-bc_number.json
+state.json
 __pycache__

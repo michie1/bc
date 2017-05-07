@@ -101,7 +101,6 @@ def add_product(s, product):
 
 # add price alert voucher
 def add_pa(s, orders):
-
     r = s.get('https://www.bike-components.de/en/checkout/finalize/')
     doc = lxml.html.document_fromstring(r.text)
     voucher_token = doc.cssselect('#voucher__token')[0].get('value')
@@ -147,6 +146,11 @@ def remove_product(s, product_id, type_id):
             '_token': token
         })
 
+def read_state():
+    with open(directory + 'state.json', 'r') as file_read:
+        data = json.load(file_read)
+        return data
+
 # Add all orders to the cart
 # and add extra data 
 def add_cart(s, orders):
@@ -155,6 +159,8 @@ def add_cart(s, orders):
         for pi, product in enumerate(products):
             data = add_product(s, product)
             if data != None:
+                orders[user][pi]['id'] = data['id']
+                orders[user][pi]['type_id'] = data['type_id']
                 orders[user][pi]['price'] = data['price']
                 orders[user][pi]['original_price'] = data['price']
                 orders[user][pi]['price'] = data['price']
@@ -162,16 +168,24 @@ def add_cart(s, orders):
                 orders[user][pi]['name'] = data['name']
                 orders[user][pi]['type'] = data['type']
                 orders[user][pi]['sku'] = data['sku']
-                
-                # Remove price alert product from basket
-                if data['pa'] != '':
-                    print('Remove product ', data['id'], data['type_id'])
-                    remove_product(s, data['id'], data['type_id'])
             else:
                 orders[user][pi] = None
 
-
         print('Order ' + user + ' added to cart')
+
+    return orders
+
+def remove_cart(s, orders):
+    state = read_state()
+    for user, products in orders.items():
+        for pi, product in enumerate(products):
+            # Remove price alert product from basket if state is not pa
+            if (not state['pa'] and product['pa'] != '') or (state['pa'] and product['pa'] == ''):
+                print('Remove product ', product['id'], product['type_id'], state['pa'])
+                remove_product(s, product['id'], product['type_id'])
+
+
+    print('Removed items from cart')
 
     return orders
 

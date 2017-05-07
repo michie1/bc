@@ -10,8 +10,10 @@ from wtos import load_orders, has_new_post
 from ss2 import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
+
+
 def read_bc_number():
-    with open(directory + 'bc_number.json', 'r') as fp:
+    with open(directory + 'state.json', 'r') as fp:
         data = json.load(fp)
         return data['number']
 
@@ -41,6 +43,9 @@ def go():
 
         orders = add_pa(s, orders)
         print('Price alerts added')
+
+        # Remove PA/NON-PA items from cart
+        orders = remove_cart(s, orders)
 
         # Load and reset spreadsheet
         wks = load_spreadsheet(bc_number)

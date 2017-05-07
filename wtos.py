@@ -10,14 +10,32 @@ from config import *
 
 def increment_bc_number(number):
     print('increment bc number')
-    with open(directory + 'bc_number.json', 'w') as fp:
-        data = {}
-        data['number'] = number
-        json.dump(data, fp)
+    with open(directory + 'state.json', 'r') as file_read:
+        data = json.load(file_read)
+        with open(directory + 'state.json', 'w') as file_write:
+            data['number'] = number
+            json.dump(data, file_write)
 
 def create_next_sheet(number):
     print('create next sheet')
     create_sheet(number)
+
+
+def set_state_pa():
+    print('set PA state')
+    with open(directory + 'state.json', 'r') as file_read:
+        data = json.load(file_read)
+        with open(directory + 'state.json', 'w') as file_write:
+            data['state'] = True
+            json.dump(data, file_write)
+
+def reset_state_pa():
+    print('reset PA state')
+    with open(directory + 'state.json', 'r') as file_read:
+        data = json.load(file_read)
+        with open(directory + 'state.json', 'w') as file_write:
+            data['state'] = False
+            json.dump(data, file_write)
 
 def load_orders(bc_number):
     #obj = untangle.parse('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=100;board=5.0')
@@ -51,7 +69,13 @@ def load_orders(bc_number):
                     poster_name = post_obj['poster']['name']
                     if poster_name == bc_chef:
                         increment_bc_number(int(bc_number) + 1)
+                        reset_state_pa()
                         create_next_sheet(int(bc_number) + 1)
+                        break
+                elif post_obj['body'][2:11] == str(int(bc_number) + 1) + ' PA': # next start
+                    poster_name = post_obj['poster']['name']
+                    if poster_name == bc_chef:
+                        set_state_pa()
                         break
                 elif post_obj['body'][2:11] == str(bc_number) + ' start': # current start
                     break # ignore

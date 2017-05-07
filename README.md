@@ -2,7 +2,7 @@
 Script that reads all orders of a topic from wtos.nl, puts everything in the basket of bike-components.de and generates a Google spreadsheet.
 
 Put email/password/directory in config.py, see config.py-example.
-Put bc number in bc_number.json, see bc_number.json.example
+Put bc number in state.json, see state.json.example
 
 ```
 virtualenv -p python3 venv
