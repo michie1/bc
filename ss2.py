@@ -123,7 +123,7 @@ def add_to_spreadsheet(wks, orders):
                 #memcache.set("busy", "0")
 
             row_number += 2
-            print('Order ' + user + ' prepared for spreadsheet')
+            # print('Order ' + user + ' prepared for spreadsheet')
             #time.sleep(1)
 
     start_row_total_sum = row_number + 1

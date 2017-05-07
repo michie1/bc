@@ -171,7 +171,7 @@ def add_cart(s, orders):
             else:
                 orders[user][pi] = None
 
-        print('Order ' + user + ' added to cart')
+        # print('Order ' + user + ' added to cart')
 
     return orders
 

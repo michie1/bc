@@ -147,7 +147,8 @@ def load_orders(bc_number):
                                         })
                                     else:
                                         print('Wrong url: ', product_url)
-                    print('Order ' + poster_name + ' loaded')
+                    #print(poster_name.encode('latin1'))
+                    #print('Order ' + poster_name.encode('latin1') + ' loaded')
                     #break
                         #print post[3]
 
