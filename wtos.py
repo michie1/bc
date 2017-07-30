@@ -46,7 +46,7 @@ def load_orders(bc_number):
     orders = {}
 
     # maybe need to increase 80 when there are more posts between two orders.
-    file = urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=80;board=5.0')
+    file = urlopen('http://retro.wtos.nl/prikbord/index.php?action=.xml;limit=80;board=5.0')
     data = file.read()
     file.close()
     print('Posts loaded')
@@ -166,7 +166,7 @@ def load_orders(bc_number):
 
 def load_orders_test(number):
 
-    topic_url = 'http://www.wtos.nl/prikbord/index.php?topic=6126.msg78335;topicseen#new'
+    topic_url = 'http://retro.wtos.nl/prikbord/index.php?topic=6126.msg78335;topicseen#new'
 
     if False:
         t = requests.get(topic_url)
@@ -197,7 +197,7 @@ def load_orders_test(number):
     return orders
 
 def has_new_post():
-    file = urllib.urlopen('http://www.wtos.nl/prikbord/index.php?action=.xml;limit=10;board=5.0')
+    file = urllib.urlopen('http://retro.wtos.nl/prikbord/index.php?action=.xml;limit=10;board=5.0')
     data = file.read()
     file.close()
 
