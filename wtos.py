@@ -41,50 +41,46 @@ def load_orders(bc_number):
     #obj = untangle.parse('http://retro.wtos.nl/prikbord/index.php?action=.xml;limit=100;board=5.0')
     #print obj.smf_xml_feed.recent_post[0].starter.name.cdata
 
-    bc_chef = 'Tim.'
+    bc_chef = 'Michiel'
 
     orders = {}
 
-    # maybe need to increase 80 when there are more posts between two orders.
-    file = urlopen('http://retro.wtos.nl/prikbord/index.php?action=.xml;limit=80;board=5.0')
-    data = file.read()
-    file.close()
+    print(bc_number)
+    with urlopen('http://wtos.nl/bc.php?number=' + bc_number) as url:
+        data = json.loads(url.read().decode())
     print('Posts loaded')
 
-    xml = xmltodict.parse(data)
+    recent_posts = data
 
-    recent_posts = xml["smf:xml-feed"]['recent-post']
 
     #for post_obj in xml.items()[0][1:][0].items()[3][1]:
     for post_obj in recent_posts:
-        #import pdb; pdb.set_trace()
-        #post = post_obj.values()
-        #topic_id = post[6].values()[1]
-        topic_id = post_obj['topic']['id']
-        if topic_id == '6335':
-            #doc = lxml.html.document_fromstring(html)
             if True:
-                #if post[3][2:5] == str(bc_number):
-                if post_obj['body'][2:11] == str(int(bc_number) + 1) + ' start': # next start
-                    poster_name = post_obj['poster']['name']
-                    if poster_name == bc_chef:
+                content = post_obj['post_content']
+                poster = post_obj['display_name']
+                print(content[2:5] == str(bc_number))
+                if content[2:11] == str(int(bc_number) + 1) + ' start': # next start
+                    print('next')
+                    if poster == bc_chef:
                         increment_bc_number(int(bc_number) + 1)
                         reset_state_pa()
                         create_next_sheet(int(bc_number) + 1)
                         break
-                elif post_obj['body'][2:11] == str(int(bc_number) + 1) + ' PA': # next start
-                    poster_name = post_obj['poster']['name']
-                    if poster_name == bc_chef:
+                elif content[2:11] == str(int(bc_number) + 1) + ' PA': # next start
+                    print('pa')
+                    if poster == bc_chef:
                         set_state_pa()
                         break
-                elif post_obj['body'][2:11] == str(bc_number) + ' start': # current start
-                    break # ignore
-                elif post_obj['body'][2:5] == str(bc_number): # BC123 
-                    poster_name = post_obj['poster']['name']
-                    if poster_name not in orders:
-                        orders[poster_name] = []
-                    lines = post_obj['body'].split('<br />')[1:]
+                elif content[2:11] == str(bc_number) + ' start': # current start
+                    print('current start')
+                    #break # ignore
+                elif content[2:5] == str(bc_number): # BC123
+                    print('HOI')
+                    if poster not in orders:
+                        orders[poster] = []
+                    lines = content.split('\n')[1:]
                     for line in lines:
+                        line = line.replace('\u00a0', ' ').replace('<strong>', '[b]').replace('</strong>', '[/b]')
                         if line != '':
                             if line == '---' or line == '--':
                                 break
@@ -92,17 +88,17 @@ def load_orders(bc_number):
                                 continue
                             elif line[0:2] == '<a':
                                 line = '1x ' + line
-                            
                             if line[0:5] == '<del>':
                                 continue
                             elif line == 'WTOS':
-                                if poster_name == bc_chef:
-                                    poster_name = 'WTOS'
-                                    orders[poster_name] = []
+                                if poster == bc_chef:
+                                    poster = 'WTOS'
+                                    orders[poster] = []
                                 else:
                                     break
                             else:
                                 try:
+                                    print('line', line)
                                     product_qty, product = line.split('x ', 1)
                                     product_qty = int(product_qty.strip())
                                 except ValueError as e:
@@ -112,19 +108,21 @@ def load_orders(bc_number):
                                     continue
 
                                 if product_qty > 0:
-                                    product_url = product[9:].split('"')[0]
+                                    splitted = product.split(' ')
+                                    product_url = splitted[0]
 
                                     if 'bike-components.de' in product_url:
                                         #product_type = product.split('</a>')[1].strip()
-                                            
                                         # Divide type  and pa
-                                        type_pa = product.split('</a>')[1].strip()
-                                        strong = type_pa.split('<strong>')
+                                        type_pa = ' '.join(splitted[1:])
+                                        print('tp', type_pa)
+                                        strong = type_pa.split('[b]')
+                                        print('strong', strong)
 
                                         # type and PA exists
                                         if len(strong) == 2:
                                             product_type = strong[0].strip()
-                                            product_pa = strong[1].replace('</strong>', '').strip()
+                                            product_pa = strong[1].replace('[/b]', '').strip()
                                         else:
                                             # type or PA exist
                                             if type_pa[0:8] == "<strong>":
@@ -133,13 +131,13 @@ def load_orders(bc_number):
                                                 product_type = ''
                                             else:
                                                 # type
-                                                product_type = type_pa 
+                                                product_type = type_pa
                                                 product_pa = ''
 
                                         # fix for " in type
                                         product_type = product_type.replace('&quot;', '"').replace('&nbsp;', '').strip()
 
-                                        orders[poster_name].append({
+                                        orders[poster].append({
                                             'url': product_url,
                                             'type': product_type,
                                             'qty': product_qty,
@@ -162,4 +160,5 @@ def load_orders(bc_number):
 
     #print orders
 
+    print('orders', orders)
     return orders
