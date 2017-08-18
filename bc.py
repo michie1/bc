@@ -103,7 +103,12 @@ def add_product(s, product):
 def add_pa(s, orders):
     r = s.get('https://www.bike-components.de/en/checkout/finalize/')
     doc = lxml.html.document_fromstring(r.text)
-    voucher_token = doc.cssselect('#voucher__token')[0].get('value')
+    # print('text', r.text);
+
+    select = doc.cssselect('#voucher_voucher_code')
+    # print('select', select)
+
+    voucher_token = doc.cssselect('#voucher_voucher_code').get('value')
     print('voucher_token retrieved: ', voucher_token)
 
     # adding price alerts
