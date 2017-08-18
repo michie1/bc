@@ -35,7 +35,7 @@ def get_product_data(s, product):
 
     try:
         data['id'] = doc.cssselect('input[name="products_id"]')[0].get('value')
-        data['name'] = doc.cssselect('title')[0].text.replace(' - bike-components', '').replace('buy online', '')
+        data['name'] = doc.cssselect('title')[0].text.replace(' - bike-components', '').replace('buy online', '').replace('online kaufen', '')
         #print data['id'], data['name']
         data['qty'] = str(product['qty'])
         data['pa'] = product['pa']
@@ -62,7 +62,6 @@ def get_product_data(s, product):
 
         if options.cssselect('option')[0].get('class') == 'placeholder':
             type_index += 1
-        
         data['type_id'] = options.cssselect('option')[type_index].get('value')
 
 
@@ -75,8 +74,6 @@ def get_product_data(s, product):
         print(data)
         print(e)
         return None
-        #print product['url'] + ' ' + data['type'] + ' failed'
-        # exit()
 
 # Add a product to the cart
 def add_product(s, product):
@@ -84,7 +81,7 @@ def add_product(s, product):
 
     if data != None:
         r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
-            'products_id': data['id'], 
+            'products_id': data['id'],
             'id[1]': data['type_id'],
             'products_qty': data['qty'],
             'ajaxCart': '1',
@@ -92,27 +89,19 @@ def add_product(s, product):
             })
 
         if json.loads(r.text)['action'] != 'ok':
-            print(r.text)
             exit()
 
     return data
-
-
 
 # add price alert voucher
 def add_pa(s, orders):
     r = s.get('https://www.bike-components.de/en/checkout/finalize/')
     doc = lxml.html.document_fromstring(r.text)
-    # print('text', r.text);
 
-    select = doc.cssselect('#voucher_voucher_code')
-    # print('select', select)
-
-    voucher_token = doc.cssselect('#voucher_voucher_code').get('value')
+    voucher_token = doc.cssselect('#voucher__token')[0].get('value')
     print('voucher_token retrieved: ', voucher_token)
 
     # adding price alerts
-
     for user, products in orders.items():
         for pid, product in enumerate(products):
             if product == None:
@@ -157,7 +146,7 @@ def read_state():
         return data
 
 # Add all orders to the cart
-# and add extra data 
+# and add extra data
 def add_cart(s, orders):
     for user, products in orders.items():
         #print user, order
@@ -195,12 +184,11 @@ def remove_cart(s, orders):
     return orders
 
 def clear_cart(s):
-    
     # Get cart
     r = s.get('https://www.bike-components.de/shopping_cart.php')
     doc = lxml.html.document_fromstring(r.text)
     token = doc.cssselect('body')[0].get('data-csrf-token')
- 
+
     for product in doc.cssselect('input[name="products_id[]"]'):
         r = s.post('https://www.bike-components.de/callback/cart_update.php',
             data = {
@@ -208,4 +196,3 @@ def clear_cart(s):
                 'products_id[]products_id': product.get('value'),
                 '_token': token
             })
-

@@ -38,14 +38,9 @@ def reset_state_pa():
             json.dump(data, file_write)
 
 def load_orders(bc_number):
-    #obj = untangle.parse('http://retro.wtos.nl/prikbord/index.php?action=.xml;limit=100;board=5.0')
-    #print obj.smf_xml_feed.recent_post[0].starter.name.cdata
-
-    bc_chef = 'Michiel'
-
+    bc_chef = 'Tim van Rugge'
     orders = {}
 
-    print(bc_number)
     with urlopen('http://wtos.nl/bc.php?number=' + bc_number) as url:
         data = json.loads(url.read().decode())
     print('Posts loaded')
@@ -58,24 +53,20 @@ def load_orders(bc_number):
             if True:
                 content = post_obj['post_content']
                 poster = post_obj['display_name']
-                print(content[2:5] == str(bc_number))
                 if content[2:11] == str(int(bc_number) + 1) + ' start': # next start
-                    print('next')
                     if poster == bc_chef:
                         increment_bc_number(int(bc_number) + 1)
                         reset_state_pa()
                         create_next_sheet(int(bc_number) + 1)
                         break
                 elif content[2:11] == str(int(bc_number) + 1) + ' PA': # next start
-                    print('pa')
                     if poster == bc_chef:
                         set_state_pa()
                         break
                 elif content[2:11] == str(bc_number) + ' start': # current start
-                    print('current start')
                     #break # ignore
+                    print('start')
                 elif content[2:5] == str(bc_number): # BC123
-                    print('HOI')
                     if poster not in orders:
                         orders[poster] = []
                     lines = content.split('\n')[1:]
@@ -98,7 +89,6 @@ def load_orders(bc_number):
                                     break
                             else:
                                 try:
-                                    print('line', line)
                                     product_qty, product = line.split('x ', 1)
                                     product_qty = int(product_qty.strip())
                                 except ValueError as e:
@@ -115,9 +105,7 @@ def load_orders(bc_number):
                                         #product_type = product.split('</a>')[1].strip()
                                         # Divide type  and pa
                                         type_pa = ' '.join(splitted[1:])
-                                        print('tp', type_pa)
                                         strong = type_pa.split('[b]')
-                                        print('strong', strong)
 
                                         # type and PA exists
                                         if len(strong) == 2:
@@ -145,20 +133,5 @@ def load_orders(bc_number):
                                         })
                                     else:
                                         print('Wrong url: ', product_url)
-                    #print(poster_name.encode('latin1'))
-                    #print('Order ' + poster_name.encode('latin1') + ' loaded')
-                    #break
-                        #print post[3]
 
-            #html = post.items()[3][1]
-            #print html
-            #print post.items()
-        #[0].items()[0][1]
-
-    #topic_id = recent_post.items()[6][1].items()[1][1]
-    #print topic_id
-
-    #print orders
-
-    print('orders', orders)
     return orders
