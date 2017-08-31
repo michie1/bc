@@ -40,8 +40,9 @@ def reset_state_pa():
 def load_orders(bc_number):
     bc_chef = 'Tim van Rugge'
     orders = {}
+    token = 'ASDF98ASDF98823984oiadf230=9023423kjas'
 
-    with urlopen('http://wtos.nl/bc.php?number=' + bc_number) as url:
+    with urlopen('http://wtos.nl/bc.php?token=' + token + '&number=' + bc_number) as url:
         data = json.loads(url.read().decode())
     print('Posts loaded')
 
