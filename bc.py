@@ -32,14 +32,11 @@ def get_product_data(s, product):
     r = s.get(product['url'])
     doc = lxml.html.document_fromstring(r.text)
 
-
     try:
         data['id'] = doc.cssselect('input[name="products_id"]')[0].get('value')
         data['name'] = doc.cssselect('title')[0].text.replace(' - bike-components', '').replace('buy online', '').replace('online kaufen', '')
-        #print data['id'], data['name']
         data['qty'] = str(product['qty'])
         data['pa'] = product['pa']
-
 
         type_index = 0
         if product['type'] == '':
@@ -54,7 +51,6 @@ def get_product_data(s, product):
                 li = doc.cssselect('li[itemprop="offers"]')[type_index]
 
 
-
         data['price'] = float(li.cssselect('meta[itemprop="price"]')[0].get('content'))
         data['sku'] = li.cssselect('meta[itemprop="sku"]')[0].get('content')
 
@@ -63,16 +59,12 @@ def get_product_data(s, product):
         if options.cssselect('option')[0].get('class') == 'placeholder':
             type_index += 1
         data['type_id'] = options.cssselect('option')[type_index].get('value')
-
-
         data['token'] = doc.cssselect('body')[0].get('data-csrf-token')
 
         return data
 
     except IndexError as e:
-        print('type does not exist?')
-        print(data)
-        print(e)
+        print('Item/type does not exist?')
         return None
 
 # Add a product to the cart
@@ -121,8 +113,7 @@ def add_pa(s, orders):
                     pa_price = doc.cssselect('div.row [data-voucher-code="' + product['pa'] + '"]')[0].getparent().getparent().getparent().cssselect('.price-single .value.discounted')[0].text.strip().replace(',', '.')[0:-1]
                     product['price'] = pa_price
                 except IndexError as e:
-                    print('Something wrong with price alert: ' + product['pa'])
-                    print(e)
+                    print('Something wrong with price alert: ' + product['pa'], 'maybe already used')
             time.sleep(1)
 
     return orders

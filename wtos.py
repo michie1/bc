@@ -74,7 +74,7 @@ def load_orders(bc_number):
                     for line in lines:
                         line = line.replace('\u00a0', ' ').replace('<strong>', '[b]').replace('</strong>', '[/b]')
                         if line != '':
-                            if line == '---' or line == '--':
+                            if line == '---' or line == '--' or line == '&nbsp;':
                                 break
                             elif line[0] == '-' and line[-1] == '-':
                                 continue
