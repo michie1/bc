@@ -7,6 +7,11 @@ from urllib.request import urlopen
 import json
 from ss2 import create_sheet
 from config import *
+import ssl
+
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
 
 def increment_bc_number(number):
     print('increment bc number')
@@ -42,7 +47,7 @@ def load_orders(bc_number):
     orders = {}
     token = 'ASDF98ASDF98823984oiadf230=9023423kjas'
 
-    with urlopen('http://wtos.nl/bc.php?token=' + token + '&number=' + bc_number) as url:
+    with urlopen('https://wtos.nl/bc.php?token=' + token + '&number=' + bc_number, context=ctx) as url:
         data = json.loads(url.read().decode())
     print('Posts loaded')
 

@@ -46,9 +46,12 @@ def get_product_data(s, product):
         else:
             data['type'] = product['type']
             li = doc.cssselect('li[itemprop="offers"]')[type_index]
-            while product['type'] != li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1]:
-                type_index += 1
-                li = doc.cssselect('li[itemprop="offers"]')[type_index]
+            # Originally we has to remove the last character, but BC changed something
+            # so now we do two comparesions, with and without the last character.
+            while product['type'] != li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1] and product['type'] != li.cssselect('span[itemprop="name"]')[0].text.strip():
+                    type_index += 1
+                    li = doc.cssselect('li[itemprop="offers"]')[type_index]
+                
 
 
         data['price'] = float(li.cssselect('meta[itemprop="price"]')[0].get('content'))
@@ -65,6 +68,8 @@ def get_product_data(s, product):
 
     except IndexError as e:
         print('Item/type does not exist?')
+        print(e)
+        exit()
         return None
 
 # Add a product to the cart
@@ -140,7 +145,6 @@ def read_state():
 # and add extra data
 def add_cart(s, orders):
     for user, products in orders.items():
-        #print user, order
         for pi, product in enumerate(products):
             data = add_product(s, product)
             if data != None:
@@ -155,8 +159,6 @@ def add_cart(s, orders):
                 orders[user][pi]['sku'] = data['sku']
             else:
                 orders[user][pi] = None
-
-        # print('Order ' + user + ' added to cart')
 
     return orders
 
