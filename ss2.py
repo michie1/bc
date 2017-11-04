@@ -82,8 +82,8 @@ def add_to_spreadsheet(wks, orders):
                     continue
 
                 try:
-                    #cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].decode('utf-8').split(' ', 1) # no decode in python3.5
-                    cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].split(' ', 1)
+                    cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].decode('utf-8').split(' ', 1) # no decode in python3.5
+                    # cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].split(' ', 1)
                 except IndexError as e:
                     print(e)
                     print(user, product)

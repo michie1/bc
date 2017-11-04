@@ -47,9 +47,8 @@ def load_orders(bc_number):
     orders = {}
     token = 'ASDF98ASDF98823984oiadf230=9023423kjas'
 
-    with urlopen('https://wtos.nl/bc.php?token=' + token + '&number=' + bc_number, context=ctx) as url:
+    with urlopen('https://wtos.nl/bc.php?token=' + token + '&number=' + bc_number) as url:
         data = json.loads(url.read().decode())
-    print('Posts loaded')
 
     recent_posts = data
 

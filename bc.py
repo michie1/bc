@@ -34,7 +34,7 @@ def get_product_data(s, product):
 
     try:
         data['id'] = doc.cssselect('input[name="products_id"]')[0].get('value')
-        data['name'] = doc.cssselect('title')[0].text.replace(' - bike-components', '').replace('buy online', '').replace('online kaufen', '')
+        data['name'] = doc.cssselect('title')[0].text.replace(' - bike-components', '').replace('buy online', '').replace('online kaufen', '').encode('utf-8')
         data['qty'] = str(product['qty'])
         data['pa'] = product['pa']
 
@@ -51,8 +51,6 @@ def get_product_data(s, product):
             while product['type'] != li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1] and product['type'] != li.cssselect('span[itemprop="name"]')[0].text.strip():
                     type_index += 1
                     li = doc.cssselect('li[itemprop="offers"]')[type_index]
-                
-
 
         data['price'] = float(li.cssselect('meta[itemprop="price"]')[0].get('content'))
         data['sku'] = li.cssselect('meta[itemprop="sku"]')[0].get('content')
