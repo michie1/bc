@@ -67,6 +67,7 @@ def get_product_data(s, product):
     except IndexError as e:
         print('Item/type does not exist?')
         print(e)
+        print(data)
         exit()
         return None
 
