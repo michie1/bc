@@ -64,7 +64,7 @@ def add_to_spreadsheet(wks, orders):
     cell_list[6].value = 'Prijs per stuk'
     cell_list[7].value = 'Aantal'
     cell_list[8].value = 'Totaal'
-    cell_list[9].value = '5%'
+    cell_list[9].value = '5% (mits geen PA)'
     #wks.update_cells(header)
     row_number += 1
 
@@ -105,7 +105,7 @@ def add_to_spreadsheet(wks, orders):
 
                 cell_list[row_number*10+7].value = product['qty']
                 cell_list[row_number*10+8].value = "=G" + str(row_number+1) + "*H" + str(row_number+1)
-                cell_list[row_number*10+9].value = "=CEILING(I" + str(row_number+1) + "*0.95, 0.01)"
+                cell_list[row_number*10+9].value = "=CEILING(IF(ISBLANK(E" + str(row_number+1) + "), I" + str(row_number+1) + "*0.95, I" + str(row_number+1) + "), 0.01)"
                 row_number += 1
 
             last_row = row_number - 1
