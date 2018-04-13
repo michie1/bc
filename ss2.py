@@ -105,7 +105,7 @@ def add_to_spreadsheet(wks, orders):
 
                 cell_list[row_number*10+7].value = product['qty']
                 cell_list[row_number*10+8].value = "=G" + str(row_number+1) + "*H" + str(row_number+1)
-                cell_list[row_number*10+9].value = "=CEILING(IF(ISBLANK(E" + str(row_number+1) + "), I" + str(row_number+1) + "*0.95, I" + str(row_number+1) + "), 0.01)"
+                cell_list[row_number*10+9].value = "=CEILING(IF(LEN(E" + str(row_number+1) + ")=8,I" + str(row_number+1) + ",0.95*I" + str(row_number+1) + "),0.01)"
                 row_number += 1
 
             last_row = row_number - 1
