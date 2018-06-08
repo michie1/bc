@@ -1,4 +1,4 @@
 #!/bin/bash
 service cron start &&
-touch log.txt &&
+#touch log.txt &&
 tail -f log.txt

@@ -2,3 +2,7 @@ version: '3.2'
 services:
   bc:
     build: '.'
+    volumes:
+      - type: bind
+        source: ./log.txt
+        target: /src/log.txt
