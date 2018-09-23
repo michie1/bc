@@ -1,7 +1,7 @@
 import lxml.html
 import json
 import time
-from config import *
+import config 
 
 def login(s):
     r = s.get('https://www.bike-components.de/en/')
@@ -14,8 +14,8 @@ def login(s):
     r = s.post(
     'https://www.bike-components.de/en/light-login/',
         data = {
-            'login[email]': email,
-            'login[password]': password,
+            'login[email]': config.email,
+            'login[password]': config.password,
             'login[_token]': token,
             'login[redirect]': ''
          })

@@ -5,7 +5,6 @@ import lxml.html
 from lxml import etree
 import json
 
-from config import *
 from wtos import load_orders 
 from spreadsheet import load_spreadsheet, add_to_spreadsheet
 from bc import *

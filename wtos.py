@@ -6,7 +6,7 @@ import xmltodict
 from urllib.request import urlopen
 import json
 from spreadsheet import create_sheet
-from config import *
+import config
 import ssl
 
 ctx = ssl.create_default_context()
@@ -43,9 +43,9 @@ def reset_state_pa():
             json.dump(data, file_write)
 
 def load_orders(bc_number):
-    bc_chef = 'Tim van Rugge'
+    bc_chef = config.bc_chef
     orders = {}
-    token = 'ASDF98ASDF98823984oiadf230=9023423kjas'
+    token = config.wtos_token
 
     with urlopen('https://wtos.nl/bc.php?token=' + token + '&number=' + bc_number) as url:
         data = json.loads(url.read().decode())
