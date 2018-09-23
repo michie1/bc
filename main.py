@@ -5,17 +5,15 @@ import lxml.html
 from lxml import etree
 import json
 
-from wtos import load_orders 
+import config
+from wtos import load_orders
 from spreadsheet import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
-
-
 def read_bc_number():
-    with open(directory + 'state.json', 'r') as fp:
+    with open(config.directory + 'state.json', 'r') as fp:
         data = json.load(fp)
         return data['number']
-
 
 def go():
     s = requests.Session()
@@ -56,7 +54,6 @@ def go():
         print('Finished')
     else:
         print('No orders')
-        
 
 if __name__ == "__main__":
     go()
