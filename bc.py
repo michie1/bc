@@ -5,22 +5,22 @@ from config import *
 
 def login(s):
     r = s.get('https://www.bike-components.de/en/')
-    r = s.get('https://www.bike-components.de/en/login/')
+    r = s.get('https://www.bike-components.de/en/light-login/')
 
     doc = lxml.html.document_fromstring(r.text)
-    token = doc.cssselect('input[name="module9200[login][_token]"]')[0].value
+    token = doc.cssselect('input[name="login[_token]"]')[0].value
     print('Token retrieved: ', token)
 
     r = s.post(
-    'https://www.bike-components.de/en/login/',
+    'https://www.bike-components.de/en/light-login/',
         data = {
-            'module9200[login][email]': email,
-            'module9200[login][password]': password,
-            'module9200[login][_token]': token,
-            'module9200[login][submit]': ''
+            'login[email]': email,
+            'login[password]': password,
+            'login[_token]': token,
+            'login[redirect]': ''
          })
 
-    if r.text.find('Your shopping cart') == -1:
+    if r.text.find('Mein Konto') == -1:
         print('Not logged in')
         exit()
     print('Logged in')
