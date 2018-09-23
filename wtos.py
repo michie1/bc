@@ -5,7 +5,7 @@ import lxml.html
 import xmltodict
 from urllib.request import urlopen
 import json
-from ss2 import create_sheet
+from spreadsheet import create_sheet
 from config import *
 import ssl
 
