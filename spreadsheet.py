@@ -4,13 +4,13 @@ import math
 from oauth2client.service_account import ServiceAccountCredentials
 import time
 import pdb
-from config import directory
+import config
 
 def create_sheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open(directory + 'credentials.json'))
+    json_key = json.load(open(config.directory + 'credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(directory + 'credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(config.directory + 'credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
@@ -20,9 +20,9 @@ def create_sheet(bc_number):
 
 def load_spreadsheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open(directory + 'credentials.json'))
+    json_key = json.load(open(config.directory + 'credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(directory + 'credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(config.directory + 'credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
@@ -36,13 +36,13 @@ def load_spreadsheet(bc_number):
         sh.del_worksheet(sh.worksheet("BC" + str(bc_number)))
     except gspread.exceptions.WorksheetNotFound as err:
         print(err)
-    
+
     # make worksheet
     wks = sh.add_worksheet(title='BC' + str(bc_number), rows='200', cols='10')
     #wks = sh.worksheet('105_cart')
 
     sh.del_worksheet(sh.worksheet('0'))
-    
+
     return wks
 
 def add_to_spreadsheet(wks, orders):
@@ -69,7 +69,7 @@ def add_to_spreadsheet(wks, orders):
     row_number += 1
 
     summary = []
-    
+
     #for user, products in orders.iteritems():
     for user, products in sorted(orders.items()):
         if len(products) > 0:
@@ -98,7 +98,7 @@ def add_to_spreadsheet(wks, orders):
                 cell_list[row_number*10+2].value = product['type']
                 cell_list[row_number*10+3].value = "=(\"" + product['sku'] + "\")"
                 cell_list[row_number*10+4].value = product['pa']
-                
+
                 # todo ceiling
                 cell_list[row_number*10+5].value = product['original_price']
                 cell_list[row_number*10+6].value = product['price']
@@ -146,8 +146,6 @@ def add_to_spreadsheet(wks, orders):
     cell_list[row_number*10].value = "Met porto"
     cell_list[row_number*10+1].value = "=B" + str((row_number)) + "+5.95"
     row_number += 1
-
-    
 
     wks.update_cells(cell_list)
 
