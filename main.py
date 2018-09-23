@@ -7,7 +7,7 @@ import json
 
 from config import *
 from wtos import load_orders 
-from ss2 import load_spreadsheet, add_to_spreadsheet
+from spreadsheet import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
 
