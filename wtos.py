@@ -15,9 +15,9 @@ ctx.verify_mode = ssl.CERT_NONE
 
 def increment_bc_number(number):
     print('increment bc number')
-    with open(directory + 'state.json', 'r') as file_read:
+    with open(config.directory + 'state.json', 'r') as file_read:
         data = json.load(file_read)
-        with open(directory + 'state.json', 'w') as file_write:
+        with open(config.directory + 'state.json', 'w') as file_write:
             data['number'] = number
             json.dump(data, file_write)
 
@@ -28,17 +28,17 @@ def create_next_sheet(number):
 
 def set_state_pa():
     print('set PA state')
-    with open(directory + 'state.json', 'r') as file_read:
+    with open(config.directory + 'state.json', 'r') as file_read:
         data = json.load(file_read)
-        with open(directory + 'state.json', 'w') as file_write:
+        with open(config.directory + 'state.json', 'w') as file_write:
             data['state'] = True
             json.dump(data, file_write)
 
 def reset_state_pa():
     print('reset PA state')
-    with open(directory + 'state.json', 'r') as file_read:
+    with open(config.directory + 'state.json', 'r') as file_read:
         data = json.load(file_read)
-        with open(directory + 'state.json', 'w') as file_write:
+        with open(config.directory + 'state.json', 'w') as file_write:
             data['state'] = False
             json.dump(data, file_write)
 
