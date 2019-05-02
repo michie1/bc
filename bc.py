@@ -158,7 +158,6 @@ def add_cart(s, orders):
                 orders[user][pi]['pa'] = data['pa']
                 orders[user][pi]['name'] = data['name']
                 orders[user][pi]['type'] = data['type']
-                orders[user][pi]['sku'] = data['sku']
             else:
                 orders[user][pi] = None
 
