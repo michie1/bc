@@ -3,7 +3,6 @@ import gspread
 import math
 from oauth2client.service_account import ServiceAccountCredentials
 import time
-import pdb
 import config
 
 def create_sheet(bc_number):
@@ -46,26 +45,19 @@ def load_spreadsheet(bc_number):
     return wks
 
 def add_to_spreadsheet(wks, orders):
-
-    #orders = sorted(orders)
-
     cell_list = wks.range("A1:J%s" % 200)
-    #print cell_list
-    #pdb.set_trace()
 
     row_number = 0
 
     #header[0].value = 'besteller'
     #header[1].value = 'artikel'
     #header[2].value = 'type'
-    #header[3].value = 'sku'
     cell_list[4].value = 'Price alert'
     cell_list[5].value = 'Originele prijs'
     cell_list[6].value = 'Prijs per stuk'
     cell_list[7].value = 'Aantal'
     cell_list[8].value = 'Totaal'
     cell_list[9].value = '5% (mits geen PA)'
-    #wks.update_cells(header)
     row_number += 1
 
     summary = []
@@ -83,7 +75,6 @@ def add_to_spreadsheet(wks, orders):
 
                 try:
                     cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].decode('utf-8').split(' ', 1) # no decode in python3.5
-                    # cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].split(' ', 1)
                 except IndexError as e:
                     print(e)
                     print(user, product)
@@ -96,10 +87,8 @@ def add_to_spreadsheet(wks, orders):
                     continue
 
                 cell_list[row_number*10+2].value = product['type']
-                cell_list[row_number*10+3].value = "=(\"" + product['sku'] + "\")"
                 cell_list[row_number*10+4].value = product['pa']
 
-                # todo ceiling
                 cell_list[row_number*10+5].value = product['original_price']
                 cell_list[row_number*10+6].value = product['price']
 
@@ -115,16 +104,7 @@ def add_to_spreadsheet(wks, orders):
 
             summary.append((user, '=SUM(J' + str(first_row+1) + ':J' + str(last_row+1) + ')'))
 
-            #try:
-                #cell_list[row_number+8].value = '=SUM(I' + str(first_row) + ':I' + str(last_row) + ')'
-                #cell_list[row_number+9].value = '=SUM(J' + str(first_row) + ':J' + str(last_row) + ')'
-            #except gspread.exceptions.ConnectionError as err:
-                #print err
-                #memcache.set("busy", "0")
-
             row_number += 2
-            # print('Order ' + user + ' prepared for spreadsheet')
-            #time.sleep(1)
 
     start_row_total_sum = row_number + 1
     for user_sum in summary:

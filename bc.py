@@ -58,7 +58,6 @@ def get_product_data(s, product):
 
         data['type'] = product['type']
         data['price'] = float(option.get('data-price')[0:-1].replace(',', '.')) # remove last euro char
-        data['sku'] = 'deprecated?'
         data['type_id'] = option.get('value')
 
         data['token'] = doc.cssselect('body')[0].get('data-csrf-token')
