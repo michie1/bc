@@ -8,3 +8,4 @@ requests==2.12.4
 rsa==3.4.2
 six==1.10.0
 xmltodict==0.10.2
+lxml==4.3.3

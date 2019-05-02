@@ -38,28 +38,41 @@ def get_product_data(s, product):
         data['qty'] = str(product['qty'])
         data['pa'] = product['pa']
 
-        type_index = 0
+        type_index = 0 # skip first element that's a placeholder
+        options = doc.cssselect('option[data-price]')
+
         if product['type'] == '':
             # get default type
-            li = doc.cssselect('li[itemprop="offers"]')[type_index]
-            data['type'] = li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1]
+            # li = doc.cssselect('li[itemprop="offers"]')[type_index]
+            # data['type'] = li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1]
+
+            option = options[type_index]
+            option_type_name = get_option_type_name(option)
+            data['type'] = product['type']
         else:
             data['type'] = product['type']
-            li = doc.cssselect('li[itemprop="offers"]')[type_index]
+            #print(lxml.etree.tostring(option))
+
+            option = options[type_index]
+            option_type_name = get_option_type_name(option)
+            print(option_type_name)
             # Originally we has to remove the last character, but BC changed something
             # so now we do two comparesions, with and without the last character.
-            while product['type'] != li.cssselect('span[itemprop="name"]')[0].text.strip()[0:-1] and product['type'] != li.cssselect('span[itemprop="name"]')[0].text.strip():
+            while product['type'] != option_type_name[0:-1] and product['type'] != option_type_name:
                     type_index += 1
-                    li = doc.cssselect('li[itemprop="offers"]')[type_index]
+                    option = options[type_index]
+                    option_type_name = get_option_type_name(option)
 
-        data['price'] = float(li.cssselect('meta[itemprop="price"]')[0].get('content'))
-        data['sku'] = li.cssselect('meta[itemprop="sku"]')[0].get('content')
+        data['price'] = float(option.get('data-price')[0:-1].replace(',', '.')) # skip last euro char
+        print(data['price'])
+        data['sku'] = 'deprecated?' # option.cssselect('meta[itemprop="sku"]')[0].get('content')
+        data['type_id'] = option.get('value')
 
-        options = doc.cssselect('div#module-product-detail-options')[0]
+        # options = doc.cssselect('div#module-product-detail-options')[0]
 
-        if options.cssselect('option')[0].get('class') == 'placeholder':
-            type_index += 1
-        data['type_id'] = options.cssselect('option')[type_index].get('value')
+        # if options.cssselect('option')[0].get('class') == 'placeholder':
+        #    type_index += 1
+        # data['type_id'] = options.cssselect('option')[type_index].get('value')
         data['token'] = doc.cssselect('body')[0].get('data-csrf-token')
 
         return data
@@ -70,6 +83,9 @@ def get_product_data(s, product):
         print(data)
         exit()
         return None
+
+def get_option_type_name(option):
+    return option.text_content().replace('| in stock', '').replace('| lagernd', '').strip()
 
 # Add a product to the cart
 def add_product(s, product):

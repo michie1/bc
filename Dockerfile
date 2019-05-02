@@ -2,7 +2,6 @@ FROM python:3
 
 RUN apt-get update
 RUN apt-get install cron coreutils -y
-RUN apt-get install python-lxml -y
 
 WORKDIR /src/
 
