@@ -72,7 +72,7 @@ def get_product_data(s, product):
         return None
 
 def get_option_type_name(option):
-    return option.text_content().replace('| in stock', '').replace('| lagernd', '').strip()
+    return option.text_content().split('|')[0].strip()
 
 # Add a product to the cart
 def add_product(s, product):
