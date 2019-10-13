@@ -82,7 +82,7 @@ def add_product(s, product):
         r = s.post('https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1', data = {
             'products_id': data['id'],
             'id[1]': data['type_id'],
-            'products_qty': data['qty'],
+            'quantity': data['qty'],
             'ajaxCart': '1',
             '_token': data['token']
             })
