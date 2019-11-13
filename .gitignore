@@ -5,3 +5,4 @@ credentials.json
 state.json
 __pycache__
 lib
+.vscode/

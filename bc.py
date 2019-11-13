@@ -97,6 +97,18 @@ def add_pa(s, orders):
     r = s.get('https://www.bike-components.de/en/checkout/finalize/')
     doc = lxml.html.document_fromstring(r.text)
 
+    if not doc.cssselect('#voucher__token'):
+        payment_token = doc.cssselect('#payment__token')[0].get('value')
+        print('Payment token retrieved: ', payment_token)
+        r = s.post('https://www.bike-components.de/en/checkout/payment/',
+                            data = {
+                                'payment[type]': 'prepayment',
+                                'payment[submit]': '' ,
+                                'payment[_token]': payment_token
+                                }
+                            )   
+
+    doc = lxml.html.document_fromstring(r.text)
     voucher_token = doc.cssselect('#voucher__token')[0].get('value')
     print('voucher_token retrieved: ', voucher_token)
 
