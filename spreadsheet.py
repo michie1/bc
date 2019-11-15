@@ -5,6 +5,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import time
 import config
 
+
 def create_sheet(bc_number):
     print('Load Google credentials')
     json_key = json.load(open(config.directory + 'credentials.json'))
@@ -12,7 +13,7 @@ def create_sheet(bc_number):
     credentials = ServiceAccountCredentials.from_json_keyfile_name(config.directory + 'credentials.json', scope)
 
     gc = gspread.authorize(credentials)
-    sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
+    sh = gc.open_by_key(config.spreadsheet_key)
 
     sh.worksheets() # problem if this is removed
     sh.add_worksheet(title='BC' + str(bc_number), rows='1', cols='1')
@@ -24,7 +25,7 @@ def load_spreadsheet(bc_number):
     credentials = ServiceAccountCredentials.from_json_keyfile_name(config.directory + 'credentials.json', scope)
 
     gc = gspread.authorize(credentials)
-    sh = gc.open_by_key('1PgxD5wx6qrWtIfnJ89fdczpS6yKK5BOZZHcRQeZCnD4')
+    sh = gc.open_by_key(config.spreadsheet_key)
 
     sh.worksheets() # problem if this is removed
     sh.add_worksheet(title='0', rows='1', cols='1')

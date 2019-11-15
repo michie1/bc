@@ -1,5 +1,13 @@
+# bike-components.de credentials
 email = ''
 password = ''
+
+# directory of bc
 directory = '/home/michiel/bc/'
+
+# token to access WTOS site
 wtos_token = ''
 bc_chef = ''
+
+# key to access google spreadsheet
+spreadsheet_key = ''
