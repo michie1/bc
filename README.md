@@ -23,6 +23,7 @@ Ask Michiel for credentials.json, or create your own Google spreadsheet, see bel
 ### Run the program
 
 ```bash
+source venv/bin/activate
 python main.py
 ```
 
@@ -36,7 +37,7 @@ gspread uses a service account key.
 
 2. Under "API and services", search for the "Google Sheets API" and activate.
 
-3. Go to "Credentials" and select "Create credentials" -> "Service account key". 
+3. Go to "Credentials" and select "Create credentials" -> "Service account key".
 
 4. Select new service account and fill in a name. You don't have to specify a role. Select JSON as the key type.
 
