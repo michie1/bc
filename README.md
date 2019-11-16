@@ -18,7 +18,7 @@ pip install --upgrade -r requirements.txt
 
 Fill in the credentials of config.py, see config.py-example.
 Put the current bc order number in state.json, see state.json.example.
-Ask Michiel for credentials.json, or create your own Google spreadsheet, see below.
+Ask Michiel for credentials.json, create your own Google spreadsheet (see below) or copy credentials-example.json and visit (http://wtos.nl/bc?test) for the spreadsheet.
 
 ### Run the program
 
@@ -35,7 +35,7 @@ gspread uses a service account key.
 
 1. Go to [Google Developer Console](https://console.developers.google.com) and create a new project.
 
-2. Under "API and services", search for the "Google Sheets API" and activate.
+2. Under "API and services", search for the "Google Sheets API" and enable.
 
 3. Go to "Credentials" and select "Create credentials" -> "Service account key".
 
