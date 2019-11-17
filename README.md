@@ -21,7 +21,7 @@ Put the current bc order number in state.json, see state.json.example.
 There are 3 options:
 1) Ask Michiel for credentials.json
 2) Create your own Google spreadsheet (see below)
-3) Copy credentials-example.json and visit (http://wtos.nl/bc?test) for the spreadsheet. This is the most easy option for testing, but this one is shared with multiple people.
+3) Copy credentials-example.json and visit (http://wtos.nl/bc?test) for the spreadsheet. This is the most easy option for testing and starting working on this project, but this one is shared with multiple people. The spreadsheet key is already set in the example.
 
 ### Run the program
 
