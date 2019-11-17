@@ -18,7 +18,10 @@ pip install --upgrade -r requirements.txt
 
 Fill in the credentials of config.py, see config.py-example.
 Put the current bc order number in state.json, see state.json.example.
-Ask Michiel for credentials.json, create your own Google spreadsheet (see below) or copy credentials-example.json and visit (http://wtos.nl/bc?test) for the spreadsheet.
+There are 3 options:
+1) Ask Michiel for credentials.json
+2) Create your own Google spreadsheet (see below)
+3) Copy credentials-example.json and visit (http://wtos.nl/bc?test) for the spreadsheet. This is the most easy option for testing, but this one is shared with multiple people.
 
 ### Run the program
 
