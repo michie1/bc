@@ -7,7 +7,7 @@ directory = '/home/michiel/bc/'
 
 # token to access WTOS site
 wtos_token = ''
-bc_chef = ''
+bc_chef = 'Rutger Nugteren'
 
 # key to access google spreadsheet
 spreadsheet_key = '1WZhsCw5BMJ6-5bI3KmjJ9JHKuEN76_rsGzH7g1i6JrU'
