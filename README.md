@@ -46,7 +46,12 @@ gspread uses a service account key.
 
 5. Save the downloaded file as credentials.json in the main folder.
 
-6. You will need the _client_email_ from this file. In Google drive create the spreadsheet you want to use. Share this spreadsheet with the _client_email_. In this way you authorise access to the spreadsheet. If you forget to do this, you will get a  ``SpreadhsheetNotFound`` exception when trying to access this spreadsheet.
+6. You will need the _client_email_ from this file.
+In Google drive create the spreadsheet you want to use.
+Make sure the spreadsheet settings are set to locale US.
+Share this spreadsheet with the _client_email_.
+In this way you authorise access to the spreadsheet.
+If you forget to do this, you will get a  ``SpreadhsheetNotFound`` exception when trying to access shis spreadsheet.
 
 7. Retrieve the spreadsheet key from the spreadsheet url and add it to config.py.
 
