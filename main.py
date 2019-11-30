@@ -11,7 +11,7 @@ from spreadsheet import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
 def read_bc_number():
-    with open(config.directory + 'state.json', 'r') as fp:
+    with open('state.json', 'r') as fp:
         data = json.load(fp)
         return data['number']
 

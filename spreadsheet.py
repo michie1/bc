@@ -8,9 +8,9 @@ import config
 
 def create_sheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open(config.directory + 'credentials.json'))
+    json_key = json.load(open('credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(config.directory + 'credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key(config.spreadsheet_key)
@@ -20,9 +20,9 @@ def create_sheet(bc_number):
 
 def load_spreadsheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open(config.directory + 'credentials.json'))
+    json_key = json.load(open('credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(config.directory + 'credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key(config.spreadsheet_key)
