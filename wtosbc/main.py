@@ -7,10 +7,10 @@ import json
 
 from wtosbc import config, wtos, spreadsheet, bc
 
-def read_bc_number():
+def read_bc_number() -> int:
     with open('wtosbc/state.json', 'r') as fp:
         data = json.load(fp)
-        return data['number']
+        return int(data['number'])
 
 def go():
     s = requests.Session()

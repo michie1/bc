@@ -31,6 +31,11 @@ source venv/bin/activate
 python wtosbc/main.py
 ```
 
+### Type check
+```
+mypy .
+```
+
 ### Test
 ```bash
 pytest
