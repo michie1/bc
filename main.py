@@ -6,8 +6,8 @@ from lxml import etree
 import json
 
 import config
-from wtos import load_orders
-from spreadsheet import load_spreadsheet, add_to_spreadsheet
+from wtos import get_orders
+from spreadsheet import load_posts, load_spreadsheet, add_to_spreadsheet
 from bc import *
 
 def read_bc_number():
@@ -26,7 +26,8 @@ def go():
     bc_number = str(read_bc_number())
 
     # Load orders from WTOS
-    orders = load_orders(bc_number)
+    posts = load_posts(bc_number)
+    orders = get_orders(bc_number, posts)
     print('Orders loaded')
 
     if len(orders) > 0:
