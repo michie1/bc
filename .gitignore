@@ -9,3 +9,4 @@ lib
 *.ipynb
 .idea
 *.egg-info/
+.mypy_cache/

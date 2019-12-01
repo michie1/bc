@@ -31,6 +31,15 @@ source venv/bin/activate
 python wtosbc/main.py
 ```
 
+### Type check
+```
+mypy . --ignore-missing-imports
+```
+or
+```
+mypy . --ignore-missing-imports --strict
+```
+
 ### Test
 ```bash
 pytest

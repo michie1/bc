@@ -41,10 +41,10 @@ def reset_state_pa():
             data['state'] = False
             json.dump(data, file_write)
 
-def load_posts(bc_number):
+def load_posts(bc_number: int):
     token = config.wtos_token
 
-    with urlopen('https://wtos.nl/bc.php?token=' + token + '&number=' + bc_number) as url:
+    with urlopen('https://wtos.nl/bc.php?token=' + token + '&number=' + str(bc_number)) as url:
         return json.loads(url.read().decode())
 
 def get_orders(bc_number, posts):
