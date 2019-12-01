@@ -4,8 +4,7 @@ import json
 
 from wtos import get_orders
 
-class TestStringMethods(TestCase):
-
+class TestBC(TestCase):
     def test_load_orders(self):
         bc_number = '150'
         posts = load_test_posts()
@@ -14,7 +13,7 @@ class TestStringMethods(TestCase):
 
 
 def load_test_posts():
-    with open("posts_150.json") as test_posts:
+    with open('posts_150.json') as test_posts:
         return json.loads(test_posts.read())
 
 if __name__ == '__main__':

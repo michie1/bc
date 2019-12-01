@@ -67,7 +67,6 @@ def get_orders(bc_number, posts):
                 set_state_pa()
                 break
         elif content[2:11] == str(bc_number) + ' start': # current start
-            #break # ignore
             print('start')
         elif content[2:5] == str(bc_number): # BC123
             if poster not in orders:
@@ -105,8 +104,7 @@ def get_orders(bc_number, posts):
                             product_url = splitted[0]
 
                             if 'bike-components.de' in product_url:
-                                #product_type = product.split('</a>')[1].strip()
-                                # Divide type  and pa
+                                # Divide type and pa
                                 type_pa = ' '.join(splitted[1:])
                                 strong = type_pa.split('[b]')
 

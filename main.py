@@ -6,8 +6,8 @@ from lxml import etree
 import json
 
 import config
-from wtos import get_orders
-from spreadsheet import load_posts, load_spreadsheet, add_to_spreadsheet
+from wtos import get_orders, load_posts
+from spreadsheet import load_spreadsheet, add_to_spreadsheet
 from bc import *
 
 def read_bc_number():
