@@ -1,5 +1,5 @@
 attrs==19.3.0
--e git+git@github.com:michie1/bc.git@ab13bf89c480bc0cec6627aacd94794918218a82#egg=BC
+-e git+git@github.com:michie1/bc.git@039481b47105b1e7a61c0f74d96ba51556af7dba#egg=BC
 certifi==2019.11.28
 chardet==3.0.4
 cssselect==1.1.0
