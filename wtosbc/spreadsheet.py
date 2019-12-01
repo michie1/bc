@@ -3,9 +3,12 @@ import gspread
 import math
 from oauth2client.service_account import ServiceAccountCredentials
 import time
+from typing import Any
 from wtosbc import config
 
-def create_sheet(bc_number):
+Spreadsheet = Any
+
+def create_sheet(bc_number: int) -> None:
     print('Load Google credentials')
     scope = ['https://spreadsheets.google.com/feeds']
     credentials = ServiceAccountCredentials.from_json_keyfile_name('wtosbc/credentials.json', scope)
@@ -16,7 +19,7 @@ def create_sheet(bc_number):
     sh.worksheets() # problem if this is removed
     sh.add_worksheet(title='BC' + str(bc_number), rows='1', cols='1')
 
-def load_spreadsheet(bc_number):
+def load_spreadsheet(bc_number: int) -> Spreadsheet:
     print('Load Google credentials')
     scope = ['https://spreadsheets.google.com/feeds']
     credentials = ServiceAccountCredentials.from_json_keyfile_name('wtosbc/credentials.json', scope)
@@ -40,7 +43,7 @@ def load_spreadsheet(bc_number):
 
     return wks
 
-def add_to_spreadsheet(wks, orders):
+def add_to_spreadsheet(wks: Spreadsheet, orders) -> None:
     cell_list = wks.range("A1:J%s" % 200)
 
     row_number = 0

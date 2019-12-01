@@ -7,12 +7,12 @@ import json
 
 from wtosbc import config, wtos, spreadsheet, bc
 
-def read_bc_number() -> int:
+def load_bc_number() -> int:
     with open('wtosbc/state.json', 'r') as fp:
         data = json.load(fp)
         return int(data['number'])
 
-def go():
+def go() -> None:
     s = requests.Session()
     print('Session started')
 
@@ -20,7 +20,7 @@ def go():
     bc.login(s)
 
     # bc_number = '123'
-    bc_number = str(read_bc_number())
+    bc_number = load_bc_number()
 
     # Load orders from WTOS
     posts = wtos.load_posts(bc_number)
@@ -36,11 +36,11 @@ def go():
         orders = bc.add_cart(s, orders)
         print('Orders added to cart')
 
-        orders = bc.add_pa(s, orders)
+        bc.add_pa(s, orders)
         print('Price alerts added')
 
         # Remove PA/NON-PA items from cart
-        orders = bc.remove_cart(s, orders)
+        bc.remove_cart(s, orders)
 
         # Load and reset spreadsheet
         wks = spreadsheet.load_spreadsheet(bc_number)
