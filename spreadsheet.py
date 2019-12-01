@@ -128,6 +128,6 @@ def add_to_spreadsheet(wks, orders):
     cell_list[row_number*10+1].value = "=B" + str((row_number)) + "+5.95"
     row_number += 1
 
-    wks.update_cells(cell_list)
+    wks.update_cells(cell_list, value_input_option='USER_ENTERED')
 
     print('Orders added to spreadsheet')
