@@ -1,1 +1,1 @@
-0 * * * * date >> /src/log.txt && /usr/local/bin/python /src/main.py >> /src/log.txt
+0 * * * * date >> /src/log.txt && cd /src && /usr/local/bin/python main.py >> log.txt && curl https://hc-ping.com/f6721993-ce86-4538-a65a-834fcc18c796 > /dev/null
