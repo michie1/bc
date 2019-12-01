@@ -33,7 +33,11 @@ python wtosbc/main.py
 
 ### Type check
 ```
-mypy .
+mypy . --ignore-missing-imports
+```
+or
+```
+mypy . --ignore-missing-imports --strict
 ```
 
 ### Test
