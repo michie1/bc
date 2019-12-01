@@ -1,7 +1,7 @@
 import lxml.html
 import json
 import time
-import config
+from wtosbc import config
 
 def login(s):
     r = s.get('https://www.bike-components.de/en/')
