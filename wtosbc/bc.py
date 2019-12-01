@@ -139,7 +139,7 @@ def remove_product(s, product_id, type_id):
         })
 
 def read_state():
-    with open('state.json', 'r') as file_read:
+    with open('wtosbc/state.json', 'r') as file_read:
         data = json.load(file_read)
         return data
 

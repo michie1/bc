@@ -5,13 +5,10 @@ import lxml.html
 from lxml import etree
 import json
 
-import config
-from wtos import load_orders
-from spreadsheet import load_spreadsheet, add_to_spreadsheet
-from bc import *
+from wtosbc import config, wtos, spreadsheet, bc
 
 def read_bc_number():
-    with open('state.json', 'r') as fp:
+    with open('wtosbc/state.json', 'r') as fp:
         data = json.load(fp)
         return data['number']
 
@@ -20,36 +17,37 @@ def go():
     print('Session started')
 
     # Login to BC
-    login(s)
+    bc.login(s)
 
     # bc_number = '123'
     bc_number = str(read_bc_number())
 
     # Load orders from WTOS
-    orders = load_orders(bc_number)
+    posts = wtos.load_posts(bc_number)
+    orders = wtos.get_orders(bc_number, posts)
     print('Orders loaded')
 
     if len(orders) > 0:
         # First clear cart
-        clear_cart(s)
+        bc.clear_cart(s)
         print('Cart cleared')
 
         # Add to bc cart
-        orders = add_cart(s, orders)
+        orders = bc.add_cart(s, orders)
         print('Orders added to cart')
 
-        orders = add_pa(s, orders)
+        orders = bc.add_pa(s, orders)
         print('Price alerts added')
 
         # Remove PA/NON-PA items from cart
-        orders = remove_cart(s, orders)
+        orders = bc.remove_cart(s, orders)
 
         # Load and reset spreadsheet
-        wks = load_spreadsheet(bc_number)
+        wks = spreadsheet.load_spreadsheet(bc_number)
         print('Spreadsheet loaded')
 
         # Add to Google Spreadsheet
-        add_to_spreadsheet(wks, orders)
+        spreadsheet.add_to_spreadsheet(wks, orders)
 
         print('Finished')
     else:

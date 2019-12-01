@@ -11,23 +11,29 @@ git clone https://github.com/michie1/bc.git
 cd bc
 virtualenv -p python3 venv
 source venv/bin/activate
-pip install --upgrade -r requirements.txt
+pip install -r requirements.txt
+pip install -e .
 ```
 
 ### Configuration
 
-Fill in the credentials of config.py, see config.py-example.
-Put the current bc order number in state.json, see state.json.example.
+Fill in the credentials in wtosbc/config.py, see config.py-example.
+Put the current bc order number in wtosbc/state.json, see state.json.example.
 There are 3 options:
 1) Ask Michiel for credentials.json
 2) Create your own Google spreadsheet (see below)
-3) Copy credentials-example.json and visit (http://wtos.nl/bc?test) for the spreadsheet. This is the most easy option for testing and starting working on this project, but this one is shared with multiple people. The spreadsheet key is already set in the example.
+3) Copy credentials-example.json to wtosbc/credentials.json and visit (http://wtos.nl/bc?test) for the spreadsheet. This is the most easy option for testing and starting working on this project, but this one is shared with multiple people. The spreadsheet key is already set in the example.
 
 ### Run the program
 
 ```bash
 source venv/bin/activate
-python main.py
+python wtosbc/main.py
+```
+
+### Test
+```bash
+pytest
 ```
 
 ## Create your own Google spreadsheet
