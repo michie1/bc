@@ -5,8 +5,7 @@ import lxml.html
 import xmltodict
 from urllib.request import urlopen
 import json
-from spreadsheet import create_sheet
-import config
+from wtosbc import config, spreadsheet
 import ssl
 
 ctx = ssl.create_default_context()
@@ -15,30 +14,30 @@ ctx.verify_mode = ssl.CERT_NONE
 
 def increment_bc_number(number):
     print('increment bc number')
-    with open('state.json', 'r') as file_read:
+    with open('wtosbc/state.json', 'r') as file_read:
         data = json.load(file_read)
-        with open('state.json', 'w') as file_write:
+        with open('wtosbc/state.json', 'w') as file_write:
             data['number'] = number
             json.dump(data, file_write)
 
 def create_next_sheet(number):
     print('create next sheet')
-    create_sheet(number)
+    spreadsheet.create_sheet(number)
 
 
 def set_state_pa():
     print('set PA state')
-    with open('state.json', 'r') as file_read:
+    with open('wtosbc/state.json', 'r') as file_read:
         data = json.load(file_read)
-        with open('state.json', 'w') as file_write:
+        with open('wtosbc/state.json', 'w') as file_write:
             data['state'] = True
             json.dump(data, file_write)
 
 def reset_state_pa():
     print('reset PA state')
-    with open('state.json', 'r') as file_read:
+    with open('wtosbc/state.json', 'r') as file_read:
         data = json.load(file_read)
-        with open('state.json', 'w') as file_write:
+        with open('wtosbc/state.json', 'w') as file_write:
             data['state'] = False
             json.dump(data, file_write)
 

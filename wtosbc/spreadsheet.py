@@ -3,14 +3,12 @@ import gspread
 import math
 from oauth2client.service_account import ServiceAccountCredentials
 import time
-import config
-
+from wtosbc import config
 
 def create_sheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open('credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('wtosbc/credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key(config.spreadsheet_key)
@@ -20,16 +18,14 @@ def create_sheet(bc_number):
 
 def load_spreadsheet(bc_number):
     print('Load Google credentials')
-    json_key = json.load(open('credentials.json'))
     scope = ['https://spreadsheets.google.com/feeds']
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('wtosbc/credentials.json', scope)
 
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key(config.spreadsheet_key)
 
     sh.worksheets() # problem if this is removed
     sh.add_worksheet(title='0', rows='1', cols='1')
-
 
     try:
         # delete worksheet
@@ -39,7 +35,6 @@ def load_spreadsheet(bc_number):
 
     # make worksheet
     wks = sh.add_worksheet(title='BC' + str(bc_number), rows='200', cols='10')
-    #wks = sh.worksheet('105_cart')
 
     sh.del_worksheet(sh.worksheet('0'))
 
@@ -50,9 +45,6 @@ def add_to_spreadsheet(wks, orders):
 
     row_number = 0
 
-    #header[0].value = 'besteller'
-    #header[1].value = 'artikel'
-    #header[2].value = 'type'
     cell_list[4].value = 'Price alert'
     cell_list[5].value = 'Originele prijs'
     cell_list[6].value = 'Prijs per stuk'
@@ -63,7 +55,6 @@ def add_to_spreadsheet(wks, orders):
 
     summary = []
 
-    #for user, products in orders.iteritems():
     for user, products in sorted(orders.items()):
         if len(products) > 0:
             cell_list[row_number*10].value = user # no decode ni python 3.5
@@ -75,7 +66,7 @@ def add_to_spreadsheet(wks, orders):
                     continue
 
                 try:
-                    cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].decode('utf-8').split(' ', 1) # no decode in python3.5
+                    cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].decode('utf-8').split(' ', 1)
                 except IndexError as e:
                     print(e)
                     print(user, product)
@@ -128,6 +119,6 @@ def add_to_spreadsheet(wks, orders):
     cell_list[row_number*10+1].value = "=B" + str((row_number)) + "+5.95"
     row_number += 1
 
-    wks.update_cells(cell_list, value_input_option='USER_ENTERED')
+    wks.update_cells(cell_list, value_input_option="USER_ENTERED")
 
     print('Orders added to spreadsheet')
