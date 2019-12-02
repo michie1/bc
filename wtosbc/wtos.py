@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 import requests
 import lxml.html
-#import untangle
 import xmltodict
 from urllib.request import urlopen
 import json
-from wtosbc import config, spreadsheet
 import ssl
+from typing import cast
+
+from wtosbc import config, spreadsheet
+from wtosbc.custom_types import *
 
 ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
-def increment_bc_number(number):
+def increment_bc_number(number: int) -> None:
     print('increment bc number')
     with open('wtosbc/state.json', 'r') as file_read:
         data = json.load(file_read)
@@ -20,12 +22,12 @@ def increment_bc_number(number):
             data['number'] = number
             json.dump(data, file_write)
 
-def create_next_sheet(number):
+def create_next_sheet(number: int) -> None:
     print('create next sheet')
     spreadsheet.create_sheet(number)
 
 
-def set_state_pa():
+def set_state_pa() -> None:
     print('set PA state')
     with open('wtosbc/state.json', 'r') as file_read:
         data = json.load(file_read)
@@ -33,7 +35,7 @@ def set_state_pa():
             data['state'] = True
             json.dump(data, file_write)
 
-def reset_state_pa():
+def reset_state_pa() -> None:
     print('reset PA state')
     with open('wtosbc/state.json', 'r') as file_read:
         data = json.load(file_read)
@@ -41,15 +43,15 @@ def reset_state_pa():
             data['state'] = False
             json.dump(data, file_write)
 
-def load_posts(bc_number: int):
+def load_posts(bc_number: int) -> Posts:
     token = config.wtos_token
 
     with urlopen('https://wtos.nl/bc.php?token=' + token + '&number=' + str(bc_number)) as url:
-        return json.loads(url.read().decode())
+        return cast(Posts, json.loads(url.read().decode()))
 
-def get_orders(bc_number, posts):
+def get_orders(bc_number: int, posts: Posts) -> Products:
     bc_chef = config.bc_chef
-    orders = {}
+    orders: Products = {}
 
     for post in posts:
         content = post['post_content']
@@ -90,8 +92,8 @@ def get_orders(bc_number, posts):
                             break
                     else:
                         try:
-                            product_qty, product = line.split('x ', 1)
-                            product_qty = int(product_qty.strip())
+                            product_qty_str, product = line.split('x ', 1)
+                            product_qty = int(product_qty_str.strip())
                         except ValueError as e:
                             print('ValueError')
                             print(e)
