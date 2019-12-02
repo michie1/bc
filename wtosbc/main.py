@@ -33,21 +33,21 @@ def go() -> None:
         print('Cart cleared')
 
         # Add to bc cart
-        orders = bc.add_cart(s, orders)
+        orders_extended = bc.add_cart(s, orders)
         print('Orders added to cart')
 
-        bc.add_pa(s, orders)
+        bc.add_pa(s, orders_extended)
         print('Price alerts added')
 
         # Remove PA/NON-PA items from cart
-        bc.remove_cart(s, orders)
+        bc.remove_cart(s, orders_extended)
 
         # Load and reset spreadsheet
         wks = spreadsheet.load_spreadsheet(bc_number)
         print('Spreadsheet loaded')
 
         # Add to Google Spreadsheet
-        spreadsheet.add_to_spreadsheet(wks, orders)
+        spreadsheet.add_to_spreadsheet(wks, orders_extended)
 
         print('Finished')
     else:

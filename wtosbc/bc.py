@@ -1,11 +1,9 @@
 import lxml.html
 import json
 import time
-from typing import Any, List, Dict, Optional, cast
-from mypy_extensions import TypedDict
 from wtosbc import config
-
-Session = Any
+from wtosbc.custom_types import *
+from typing import Optional, cast, Any
 
 def login(s: Session) -> None:
     r = s.get('https://www.bike-components.de/en/')
@@ -28,22 +26,6 @@ def login(s: Session) -> None:
         print('Not logged in')
         exit()
     print('Logged in')
-
-class ProductData(TypedDict):
-    id: str
-    name: str
-    qty: str
-    pa: str
-    type: str
-    price: float
-    type_id: str
-    token: str
-
-class Product(TypedDict):
-    url: str
-    type: str
-    qty: int
-    pa: str
 
 # Retrieve data about product in order to POST
 def get_product_data(s: Session, product: Product) -> Optional[ProductData]:
@@ -124,19 +106,6 @@ def add_product(s: Session, product: Product) -> ProductData:
 
     return data
 
-class OrderItem(TypedDict):
-    url: str
-    type: str
-    qty: int
-    pa: str
-    id: str
-    type_id: str
-    price: float
-    original_price: float
-    name: str
-
-Orders = Dict[str, List[Optional[OrderItem]]]
-
 # add price alert voucher
 def add_pa(s: Session, orders: Orders) -> None:
     r = s.get('https://www.bike-components.de/en/checkout/finalize/')
@@ -180,14 +149,9 @@ def remove_product(s: Session, product_id: str, type_id: str) -> None:
             '_token': token
         })
 
-class State(TypedDict):
-    number: int
-    pa: bool
-    state: bool
-
 # Add all orders to the cart
 # and add extra data
-def add_cart(s: Session, orders: Any) -> Any:
+def add_cart(s: Session, orders: Any) -> Orders:
     for user, products in orders.items():
         for pi, product in enumerate(products):
             if product is not None:
@@ -204,7 +168,7 @@ def add_cart(s: Session, orders: Any) -> Any:
                 else:
                     orders[user][pi] = None
 
-    return orders
+    return cast(Orders, orders)
 
 def read_state() -> State:
     with open('wtosbc/state.json', 'r') as file_read:

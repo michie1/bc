@@ -5,6 +5,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import time
 from typing import Any
 from wtosbc import config
+from wtosbc.custom_types import *
 
 Spreadsheet = Any
 
@@ -43,7 +44,7 @@ def load_spreadsheet(bc_number: int) -> Spreadsheet:
 
     return wks
 
-def add_to_spreadsheet(wks: Spreadsheet, orders) -> None:
+def add_to_spreadsheet(wks: Spreadsheet, orders: Orders) -> None:
     cell_list = wks.range("A1:J%s" % 200)
 
     row_number = 0
@@ -65,11 +66,11 @@ def add_to_spreadsheet(wks: Spreadsheet, orders) -> None:
             first_row = row_number
 
             for product in products:
-                if product == None:
+                if product is None:
                     continue
 
                 try:
-                    cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].decode('utf-8').split(' ', 1)
+                    cell_list[row_number*10+0].value, cell_list[row_number*10+1].value = product['name'].split(' ', 1)
                 except IndexError as e:
                     print(e)
                     print(user, product)
