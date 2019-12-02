@@ -10,7 +10,7 @@ class OrderItem(TypedDict):
     type_id: str
     price: float
     original_price: float
-    name: str
+    name: bytes
 
 Orders = Dict[str, List[Optional[OrderItem]]]
 
