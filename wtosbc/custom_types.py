@@ -25,7 +25,7 @@ class State(TypedDict):
 
 class ProductData(TypedDict):
     id: str
-    name: str
+    name: bytes
     qty: str
     pa: str
     type: str
@@ -41,7 +41,7 @@ class Product(TypedDict):
     pa: str
 
 
-Products = Dict[str, List[Product]]
+ProductsPerUser = Dict[str, List[Product]]
 
 Session = Any
 

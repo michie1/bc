@@ -76,19 +76,21 @@ def add_to_spreadsheet(wks: Spreadsheet, orders: Orders) -> None:
                 if product is None:
                     continue
 
+                print("product", product)
+
                 try:
                     (
                         cell_list[row_number * 10 + 0].value,
                         cell_list[row_number * 10 + 1].value,
                     ) = (product["name"].decode("utf-8").split(" ", 1))
                 except IndexError as e:
-                    print(e)
+                    print("index error", e)
                     print(user, product)
                     print(product["type"])
                     print(row_number)
                     continue
                 except KeyError as e:
-                    print(e)
+                    print("key error", e)
                     print(user, product)
                     continue
 
