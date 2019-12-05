@@ -76,8 +76,6 @@ def add_to_spreadsheet(wks: Spreadsheet, orders: Orders) -> None:
                 if product is None:
                     continue
 
-                print("product", product)
-
                 try:
                     (
                         cell_list[row_number * 10 + 0].value,
