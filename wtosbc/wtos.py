@@ -56,9 +56,9 @@ def load_posts(bc_number: int) -> Posts:
         return cast(Posts, json.loads(url.read().decode()))
 
 
-def get_orders(bc_number: int, posts: Posts) -> Products:
+def get_orders(bc_number: int, posts: Posts) -> ProductsPerUser:
     bc_chef = config.bc_chef
-    orders: Products = {}
+    orders: ProductsPerUser = {}
 
     for post in posts:
         content = post["post_content"]

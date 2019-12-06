@@ -34,7 +34,7 @@ def login(s: Session) -> None:
 def get_product_data(s: Session, product: Product) -> Optional[ProductData]:
     data: ProductData = {
         "id": "",
-        "name": "",
+        "name": bytes(),
         "qty": "",
         "pa": "",
         "type": "",
@@ -92,7 +92,6 @@ def get_product_data(s: Session, product: Product) -> Optional[ProductData]:
         print("Item/type does not exist?")
         print(e)
         print(data)
-        exit()
         return None
 
 
@@ -101,28 +100,21 @@ def get_option_type_name(text_content: str) -> str:
 
 
 # Add a product to the cart
-def add_product(s: Session, product: Product) -> ProductData:
-    data = get_product_data(s, product)
+def add_product(s: Session, data: ProductData) -> None:
+    r = s.post(
+        "https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1",
+        data={
+            "products_id": data["id"],
+            "id[1]": data["type_id"],
+            "quantity": data["qty"],
+            "ajaxCart": "1",
+            "_token": data["token"],
+        },
+    )
 
-    if data is None:
+    if json.loads(r.text)["action"] != "ok":
+        print("Product could not be added to the cart")
         exit()
-
-    if data != None:
-        r = s.post(
-            "https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1",
-            data={
-                "products_id": data["id"],
-                "id[1]": data["type_id"],
-                "quantity": data["qty"],
-                "ajaxCart": "1",
-                "_token": data["token"],
-            },
-        )
-
-        if json.loads(r.text)["action"] != "ok":
-            exit()
-
-    return data
 
 
 # add price alert voucher
@@ -187,24 +179,34 @@ def remove_product(s: Session, product_id: str, type_id: str) -> None:
 
 # Add all orders to the cart
 # and add extra data
-def add_cart(s: Session, orders: Any) -> Orders:
-    for user, products in orders.items():
+def add_cart(s: Session, productsPerUser: ProductsPerUser) -> Orders:
+    orders: Orders = {}
+    for user, products in productsPerUser.items():
         for pi, product in enumerate(products):
             if product is not None:
-                data = add_product(s, product)
-                if data is not None:
-                    orders[user][pi]["id"] = data["id"]
-                    orders[user][pi]["type_id"] = data["type_id"]
-                    orders[user][pi]["price"] = data["price"]
-                    orders[user][pi]["original_price"] = data["price"]
-                    orders[user][pi]["price"] = data["price"]
-                    orders[user][pi]["pa"] = data["pa"]
-                    orders[user][pi]["name"] = data["name"]
-                    orders[user][pi]["type"] = data["type"]
-                else:
-                    orders[user][pi] = None
+                product_data = get_product_data(s, product)
+                if product_data is not None:
+                    add_product(s, product_data)
 
-    return cast(Orders, orders)
+                    if user not in orders:
+                        orders[user] = []
+
+                    order: OrderItem = {
+                        "url": product["url"],
+                        "type": product["type"],
+                        "qty": product["qty"],
+                        "id": product_data["id"],
+                        "type_id": product_data["type_id"],
+                        "price": product_data["price"],
+                        "original_price": product_data["price"],
+                        "price": product_data["price"],
+                        "pa": product_data["pa"],
+                        "name": product_data["name"],
+                        "type": product_data["type"],
+                    }
+                    orders[user].append(order)
+
+    return orders
 
 
 def read_state() -> State:
