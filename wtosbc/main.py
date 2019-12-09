@@ -42,9 +42,8 @@ def go() -> None:
         bc_spreadsheet = spreadsheet.load(bc_number)
         print("Spreadsheet loaded")
 
-        spreadsheet.reset(bc_spreadsheet, bc_number)
-        worksheet = spreadsheet.add_worksheet(bc_spreadsheet, bc_number)
-        spreadsheet.update_worksheet(worksheet, order_items_per_user)
+        spreadsheet.update(bc_spreadsheet, bc_number, order_items_per_user)
+
         print("Spreadsheet updated")
 
         print("Finished")

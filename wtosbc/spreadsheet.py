@@ -3,23 +3,9 @@ import gspread
 import math
 from oauth2client.service_account import ServiceAccountCredentials
 import time
-from typing import Any
+from typing import Any, cast
 from wtosbc import config
 from wtosbc.custom_types import *
-
-
-def create_sheet(bc_number: int) -> None:
-    print("Load Google credentials")
-    scope = ["https://spreadsheets.google.com/feeds"]
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        "wtosbc/credentials.json", scope
-    )
-
-    gc = gspread.authorize(credentials)
-    sh = gc.open_by_key(config.spreadsheet_key)
-
-    sh.worksheets()  # problem if this is removed
-    sh.add_worksheet(title="BC" + str(bc_number), rows="1", cols="1")
 
 
 def load(bc_number: int) -> Spreadsheet:
@@ -34,6 +20,29 @@ def load(bc_number: int) -> Spreadsheet:
     bc_spreadsheet.worksheets()  # problem if this is removed
 
     return bc_spreadsheet
+
+
+def update(
+    bc_spreadsheet: Spreadsheet, bc_number: int, order_items_per_user: OrderItemsPerUser
+) -> None:
+    reset(bc_spreadsheet, bc_number)
+    worksheet = add_worksheet(bc_spreadsheet, bc_number)
+    cells = get_cells(order_items_per_user)
+    update_cells(worksheet, cells)
+
+
+def create_sheet(bc_number: int) -> None:
+    print("Load Google credentials")
+    scope = ["https://spreadsheets.google.com/feeds"]
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        "wtosbc/credentials.json", scope
+    )
+
+    gc = gspread.authorize(credentials)
+    sh = gc.open_by_key(config.spreadsheet_key)
+
+    sh.worksheets()  # problem if this is removed
+    sh.add_worksheet(title="BC" + str(bc_number), rows="1", cols="1")
 
 
 def reset(bc_spreadsheet: Spreadsheet, bc_number: int) -> None:
@@ -54,26 +63,23 @@ def add_worksheet(bc_spreadsheet: Spreadsheet, bc_number: int) -> Worksheet:
     )
 
 
-def update_worksheet(worksheet: Worksheet, orders: OrderItemsPerUser) -> None:
-    # TODO: retrieve cells from parameter
-
-    cell_list = worksheet.range("A1:J%s" % 200)
-
+def get_cells(orders: OrderItemsPerUser) -> Cells:
+    cells: Cells = [""] * 2000
     row_number = 0
 
-    cell_list[4].value = "Price alert"
-    cell_list[5].value = "Originele prijs"
-    cell_list[6].value = "Prijs per stuk"
-    cell_list[7].value = "Aantal"
-    cell_list[8].value = "Totaal"
-    cell_list[9].value = "5% (mits geen PA)"
+    cells[4] = "Price alert"
+    cells[5] = "Originele prijs"
+    cells[6] = "Prijs per stuk"
+    cells[7] = "Aantal"
+    cells[8] = "Totaal"
+    cells[9] = "5% (mits geen PA)"
     row_number += 1
 
     summary = []
 
     for user, products in sorted(orders.items()):
         if len(products) > 0:
-            cell_list[row_number * 10].value = user  # no decode ni python 3.5
+            cells[row_number * 10] = user
             row_number += 1
             first_row = row_number
 
@@ -82,10 +88,9 @@ def update_worksheet(worksheet: Worksheet, orders: OrderItemsPerUser) -> None:
                     continue
 
                 try:
-                    (
-                        cell_list[row_number * 10 + 0].value,
-                        cell_list[row_number * 10 + 1].value,
-                    ) = (product["name"].decode("utf-8").split(" ", 1))
+                    (cells[row_number * 10 + 0], cells[row_number * 10 + 1],) = (
+                        product["name"].decode("utf-8").split(" ", 1)
+                    )
                 except IndexError as e:
                     print("index error", e)
                     print(user, product)
@@ -97,17 +102,17 @@ def update_worksheet(worksheet: Worksheet, orders: OrderItemsPerUser) -> None:
                     print(user, product)
                     continue
 
-                cell_list[row_number * 10 + 2].value = product["type"]
-                cell_list[row_number * 10 + 4].value = product["pa"]
+                cells[row_number * 10 + 2] = product["type"]
+                cells[row_number * 10 + 4] = product["pa"]
 
-                cell_list[row_number * 10 + 5].value = product["original_price"]
-                cell_list[row_number * 10 + 6].value = product["price"]
+                cells[row_number * 10 + 5] = str(product["original_price"])
+                cells[row_number * 10 + 6] = str(product["price"])
 
-                cell_list[row_number * 10 + 7].value = product["qty"]
-                cell_list[row_number * 10 + 8].value = (
+                cells[row_number * 10 + 7] = str(product["qty"])
+                cells[row_number * 10 + 8] = (
                     "=G" + str(row_number + 1) + "*H" + str(row_number + 1)
                 )
-                cell_list[row_number * 10 + 9].value = (
+                cells[row_number * 10 + 9] = (
                     "=CEILING(IF(LEN(E"
                     + str(row_number + 1)
                     + ")=8,I"
@@ -120,10 +125,10 @@ def update_worksheet(worksheet: Worksheet, orders: OrderItemsPerUser) -> None:
 
             last_row = row_number - 1
 
-            cell_list[row_number * 10 + 8].value = (
+            cells[row_number * 10 + 8] = (
                 "=SUM(I" + str(first_row + 1) + ":I" + str(last_row + 1) + ")"
             )
-            cell_list[row_number * 10 + 9].value = (
+            cells[row_number * 10 + 9] = (
                 "=SUM(J" + str(first_row + 1) + ":J" + str(last_row + 1) + ")"
             )
 
@@ -135,28 +140,32 @@ def update_worksheet(worksheet: Worksheet, orders: OrderItemsPerUser) -> None:
 
     start_row_total_sum = row_number + 1
     for user_sum in summary:
-        cell_list[row_number * 10].value = user_sum[0]
-        cell_list[row_number * 10 + 1].value = user_sum[1]
+        cells[row_number * 10] = user_sum[0]
+        cells[row_number * 10 + 1] = user_sum[1]
         row_number += 1
     end_row_total_sum = row_number
 
     row_number += 1
 
-    cell_list[row_number * 10].value = "Totaal"
-    cell_list[row_number * 10 + 1].value = (
+    cells[row_number * 10] = "Totaal"
+    cells[row_number * 10 + 1] = (
         "=SUM(B" + str(start_row_total_sum) + ":B" + str(end_row_total_sum) + ")"
     )
     row_number += 1
 
-    cell_list[row_number * 10].value = "zonder 5%"
-    cell_list[row_number * 10 + 1].value = "=B" + str((row_number)) + "/0.95"
+    cells[row_number * 10] = "zonder 5%"
+    cells[row_number * 10 + 1] = "=B" + str((row_number)) + "/0.95"
     row_number += 1
 
-    cell_list[row_number * 10].value = "Met porto"
-    cell_list[row_number * 10 + 1].value = "=B" + str((row_number)) + "+5.95"
+    cells[row_number * 10] = "Met porto"
+    cells[row_number * 10 + 1] = "=B" + str((row_number)) + "+5.95"
     row_number += 1
 
-    # TODO: return cells and add them in another function to the worksheet
-    worksheet.update_cells(cell_list, value_input_option="USER_ENTERED")
+    return cells
 
-    print("Orders added to spreadsheet")
+
+def update_cells(worksheet: Worksheet, cells: Cells) -> None:
+    worksheet_cells = worksheet.range("A1:J%s" % 200)
+    for index, cell in enumerate(cells):
+        worksheet_cells[index].value = cell
+    worksheet.update_cells(worksheet_cells, value_input_option="USER_ENTERED")

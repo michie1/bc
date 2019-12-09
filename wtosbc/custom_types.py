@@ -55,3 +55,4 @@ Posts = List[Post]
 
 Worksheet = Any
 Spreadsheet = Any
+Cells = List[str]
