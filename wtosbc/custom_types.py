@@ -26,7 +26,7 @@ class State(TypedDict):
 class Product(TypedDict):
     id: str
     name: str
-    qty: str
+    qty: int
     pa: str
     type: str
     price: float

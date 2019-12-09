@@ -38,7 +38,7 @@ def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
     product: Product = {
         "id": "",
         "name": "",
-        "qty": "",
+        "qty": 0,
         "pa": "",
         "type": "",
         "price": 0,
@@ -55,7 +55,7 @@ def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
             .replace("buy online", "")
             .replace("online kaufen", "")
         )
-        product["qty"] = str(post_item["qty"])  # TODO: store as int?
+        product["qty"] = post_item["qty"]
         product["pa"] = post_item["pa"]
 
         (type_id, price) = get_option(post_item["type"], doc)
