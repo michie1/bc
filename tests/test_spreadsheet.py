@@ -7,11 +7,6 @@ from wtosbc import spreadsheet
 Snapshot = Any
 
 
-def test_empty_cells(snapshot: Snapshot) -> None:
-    cells = spreadsheet.get_cells({})
-    snapshot.assert_match(cells)
-
-
 def test_get_cells(snapshot: Snapshot) -> None:
     order_items_per_user = load_test_order_items_per_user()
     cells = spreadsheet.get_cells(order_items_per_user)
