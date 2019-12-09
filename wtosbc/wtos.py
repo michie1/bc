@@ -56,29 +56,29 @@ def load_posts(bc_number: int) -> Posts:
         return cast(Posts, json.loads(url.read().decode()))
 
 
-def get_orders(bc_number: int, posts: Posts) -> ProductsPerUser:
+def get_post_items_per_user(bc_number: int, posts: Posts) -> PostItemsPerUser:
     bc_chef = config.bc_chef
-    orders: ProductsPerUser = {}
+    post_items_per_user: PostItemsPerUser = {}
 
     for post in posts:
         content = post["post_content"]
-        poster = post["display_name"]
+        user = post["display_name"]
 
         if content[2:11] == str(int(bc_number) + 1) + " start":  # next start
-            if poster == bc_chef:
+            if user == bc_chef:
                 increment_bc_number(int(bc_number) + 1)
                 reset_state_pa()
                 create_next_sheet(int(bc_number) + 1)
                 break
         elif content[2:11] == str(int(bc_number) + 1) + " PA":  # next start
-            if poster == bc_chef:
+            if user == bc_chef:
                 set_state_pa()
                 break
         elif content[2:11] == str(bc_number) + " start":  # current start
             print("start")
         elif content[2:5] == str(bc_number):  # BC123
-            if poster not in orders:
-                orders[poster] = []
+            if user not in post_items_per_user:
+                post_items_per_user[user] = []
             lines = content.split("\n")[1:]
             for line in lines:
                 line = (
@@ -96,9 +96,9 @@ def get_orders(bc_number: int, posts: Posts) -> ProductsPerUser:
                     if line[0:5] == "<del>":
                         continue
                     elif line == "WTOS":
-                        if poster == bc_chef:
-                            poster = "WTOS"
-                            orders[poster] = []
+                        if user == bc_chef:
+                            user = "WTOS"
+                            post_items_per_user[user] = []
                         else:
                             break
                     else:
@@ -142,7 +142,7 @@ def get_orders(bc_number: int, posts: Posts) -> ProductsPerUser:
                                     .strip()
                                 )
 
-                                orders[poster].append(
+                                post_items_per_user[user].append(
                                     {
                                         "url": product_url,
                                         "type": product_type,
@@ -153,4 +153,4 @@ def get_orders(bc_number: int, posts: Posts) -> ProductsPerUser:
                             else:
                                 print("Wrong url: ", product_url)
 
-    return orders
+    return post_items_per_user

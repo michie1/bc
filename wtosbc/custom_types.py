@@ -14,7 +14,7 @@ class OrderItem(TypedDict):
     name: bytes
 
 
-Orders = Dict[str, List[Optional[OrderItem]]]
+OrderItemsPerUser = Dict[str, List[Optional[OrderItem]]]
 
 
 class State(TypedDict):
@@ -23,7 +23,7 @@ class State(TypedDict):
     state: bool
 
 
-class ProductData(TypedDict):
+class Product(TypedDict):
     id: str
     name: bytes
     qty: str
@@ -34,14 +34,14 @@ class ProductData(TypedDict):
     token: str
 
 
-class Product(TypedDict):
+class PostItem(TypedDict):
     url: str
     type: str
     qty: int
     pa: str
 
 
-ProductsPerUser = Dict[str, List[Product]]
+PostItemsPerUser = Dict[str, List[PostItem]]
 
 Session = Any
 

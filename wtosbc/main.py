@@ -15,41 +15,36 @@ def load_bc_number() -> int:
 
 
 def go() -> None:
-    s = requests.Session()
+    session = requests.Session()
     print("Session started")
 
-    # Login to BC
-    bc.login(s)
+    bc.login(session)
 
-    # bc_number = '123'
     bc_number = load_bc_number()
 
-    # Load orders from WTOS
     posts = wtos.load_posts(bc_number)
-    orders = wtos.get_orders(bc_number, posts)
+    post_items_per_user = wtos.get_post_items_per_user(bc_number, posts)
     print("Orders loaded")
 
-    if len(orders) > 0:
-        # First clear cart
-        bc.clear_cart(s)
+    if len(post_items_per_user) > 0:
+        bc.clear_cart(session)
         print("Cart cleared")
 
-        # Add to bc cart
-        orders_extended = bc.add_cart(s, orders)
+        order_items_per_user = bc.add_cart(session, post_items_per_user)
         print("Orders added to cart")
 
-        bc.add_pa(s, orders_extended)
+        bc.add_pa(session, order_items_per_user)
         print("Price alerts added")
 
         # Remove PA/NON-PA items from cart
-        bc.remove_cart(s, orders_extended)
+        bc.remove_cart(session, order_items_per_user)
 
         # Load and reset spreadsheet
-        wks = spreadsheet.load_spreadsheet(bc_number)
+        worksheet = spreadsheet.load(bc_number)
         print("Spreadsheet loaded")
 
         # Add to Google Spreadsheet
-        spreadsheet.add_to_spreadsheet(wks, orders_extended)
+        spreadsheet.add_worksheet(worksheet, order_items_per_user)
 
         print("Finished")
     else:

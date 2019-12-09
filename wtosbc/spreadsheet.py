@@ -7,7 +7,7 @@ from typing import Any
 from wtosbc import config
 from wtosbc.custom_types import *
 
-Spreadsheet = Any
+Worksheet = Any
 
 
 def create_sheet(bc_number: int) -> None:
@@ -24,7 +24,7 @@ def create_sheet(bc_number: int) -> None:
     sh.add_worksheet(title="BC" + str(bc_number), rows="1", cols="1")
 
 
-def load_spreadsheet(bc_number: int) -> Spreadsheet:
+def load(bc_number: int) -> Worksheet:
     print("Load Google credentials")
     scope = ["https://spreadsheets.google.com/feeds"]
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -43,16 +43,19 @@ def load_spreadsheet(bc_number: int) -> Spreadsheet:
     except gspread.exceptions.WorksheetNotFound as err:
         print(err)
 
+    # TODO: Extract load/setup from add worksheet
     # make worksheet
-    wks = sh.add_worksheet(title="BC" + str(bc_number), rows="200", cols="10")
+    worksheet = sh.add_worksheet(title="BC" + str(bc_number), rows="200", cols="10")
 
     sh.del_worksheet(sh.worksheet("0"))
 
-    return wks
+    return worksheet
 
 
-def add_to_spreadsheet(wks: Spreadsheet, orders: Orders) -> None:
-    cell_list = wks.range("A1:J%s" % 200)
+def add_worksheet(worksheet: Worksheet, orders: OrderItemsPerUser) -> None:
+    # TODO: retrieve cells from parameter
+
+    cell_list = worksheet.range("A1:J%s" % 200)
 
     row_number = 0
 
@@ -151,6 +154,7 @@ def add_to_spreadsheet(wks: Spreadsheet, orders: Orders) -> None:
     cell_list[row_number * 10 + 1].value = "=B" + str((row_number)) + "+5.95"
     row_number += 1
 
-    wks.update_cells(cell_list, value_input_option="USER_ENTERED")
+    # TODO: return cells and add them in another function to the worksheet
+    worksheet.update_cells(cell_list, value_input_option="USER_ENTERED")
 
     print("Orders added to spreadsheet")
