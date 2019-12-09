@@ -35,44 +35,42 @@ def get_document(session: Session, url: str) -> Document:
 
 # Retrieve data about product in order to POST
 def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
-    product: Product = {
-        "id": "",
-        "name": "",
-        "qty": 0,
-        "pa": "",
-        "type": "",
-        "price": 0,
-        "type_id": "",
-        "token": "",
-    }
 
     # TODO: divide extracting data and converting data into 2 functions
     try:
-        product["id"] = doc.cssselect('input[name="products_id"]')[0].get("value")
-        product["name"] = (
-            doc.cssselect("title")[0]
-            .text.replace(" - bike-components", "")
-            .replace("buy online", "")
-            .replace("online kaufen", "")
-        )
-        product["qty"] = post_item["qty"]
-        product["pa"] = post_item["pa"]
-
         (type_id, price) = get_option(post_item["type"], doc)
 
-        product["type"] = post_item["type"]
-        product["price"] = price
-        product["type_id"] = type_id
-
-        product["token"] = doc.cssselect("body")[0].get("data-csrf-token")
-
-        return product
+        return {
+            "id": get_product_id(doc),
+            "name": get_product_name(doc.cssselect("title")[0].text),
+            "qty": post_item["qty"],
+            "pa": post_item["pa"],
+            "type": post_item["type"],
+            "price": price,
+            "type_id": type_id,
+            "token": get_product_token(doc),
+        }
 
     except IndexError as e:
         print("Item/type does not exist?")
         print(e)
-        print(product)
         return None
+
+
+def get_product_id(document: Document) -> str:
+    return cast(str, document.cssselect('input[name="products_id"]')[0].get("value"))
+
+
+def get_product_token(document: Document) -> str:
+    return cast(str, document.cssselect("body")[0].get("data-csrf-token"))
+
+
+def get_product_name(title: str) -> str:
+    return (
+        title.replace(" - bike-components", "")
+        .replace("buy online", "")
+        .replace("online kaufen", "")
+    )
 
 
 # Add a product to the cart
