@@ -3,7 +3,7 @@ import json
 import time
 from wtosbc import config
 from wtosbc.custom_types import *
-from typing import Optional, cast
+from typing import Optional, cast, Any
 
 
 def login(session: Session) -> None:
@@ -58,32 +58,11 @@ def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
         product["qty"] = str(post_item["qty"])  # TODO: store as int?
         product["pa"] = post_item["pa"]
 
-        type_index = 0
-        options = doc.cssselect("option[data-price]")
-
-        ## TODO: move this if / else into own function for extracting price and type_id
-        if post_item["type"] == "":
-            option = options[type_index]
-            option_type_name = get_option_type_name(option.text_content())
-        else:
-            option = options[type_index]
-            option_type_name = get_option_type_name(option.text_content())
-
-            # Originally we had to remove the last character, but BC changed something
-            # so now we do two comparisons, with and without the last character.
-            while (
-                post_item["type"] != option_type_name[0:-1]
-                and post_item["type"] != option_type_name
-            ):
-                type_index += 1
-                option = options[type_index]
-                option_type_name = get_option_type_name(option.text_content())
+        (type_id, price) = get_option(post_item["type"], doc)
 
         product["type"] = post_item["type"]
-        product["price"] = float(
-            option.get("data-price")[0:-1].replace(",", ".")
-        )  # remove last euro char
-        product["type_id"] = option.get("value")
+        product["price"] = price
+        product["type_id"] = type_id
 
         product["token"] = doc.cssselect("body")[0].get("data-csrf-token")
 
@@ -94,10 +73,6 @@ def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
         print(e)
         print(product)
         return None
-
-
-def get_option_type_name(text_content: str) -> str:
-    return text_content.split("|")[0].strip()
 
 
 # Add a product to the cart
@@ -256,3 +231,37 @@ def clear_cart(session: Session) -> None:
                 "_token": token,
             },
         )
+
+
+def get_option(post_item_type: str, doc: Document) -> Any:
+    type_index = 0
+    options = doc.cssselect("option[data-price]")
+
+    if post_item_type == "":
+        option = options[type_index]
+        option_type_name = get_option_type_name(option.text_content())
+    else:
+        option = options[type_index]
+        option_type_name = get_option_type_name(option.text_content())
+
+        # Originally we had to remove the last character, but BC changed something
+        # so now we do two comparisons, with and without the last character.
+        while (
+            post_item_type != option_type_name[0:-1]
+            and post_item_type != option_type_name
+        ):
+            type_index += 1
+            option = options[type_index]
+            option_type_name = get_option_type_name(option.text_content())
+
+    price = float(
+        option.get("data-price")[0:-1].replace(",", ".")
+    )  # remove last euro char
+
+    type_id = option.get("value")
+
+    return (type_id, price)
+
+
+def get_option_type_name(text_content: str) -> str:
+    return text_content.split("|")[0].strip()
