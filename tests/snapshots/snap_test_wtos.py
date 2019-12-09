@@ -7,7 +7,7 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots["test_load_orders 1"] = {
+snapshots["test_get_post_items_per_user 1"] = {
     "Aubin Macquart": [
         {
             "pa": "PU2N26L9",
