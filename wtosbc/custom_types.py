@@ -11,7 +11,7 @@ class OrderItem(TypedDict):
     type_id: str
     price: float
     original_price: float
-    name: bytes
+    name: str
 
 
 OrderItemsPerUser = Dict[str, List[Optional[OrderItem]]]
@@ -25,7 +25,7 @@ class State(TypedDict):
 
 class Product(TypedDict):
     id: str
-    name: bytes
+    name: str
     qty: str
     pa: str
     type: str
@@ -52,3 +52,7 @@ class Post(TypedDict):
 
 
 Posts = List[Post]
+
+Worksheet = Any
+Spreadsheet = Any
+Cells = List[str]

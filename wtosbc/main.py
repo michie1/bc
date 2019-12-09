@@ -39,12 +39,12 @@ def go() -> None:
         # Remove PA/NON-PA items from cart
         bc.remove_cart(session, order_items_per_user)
 
-        # Load and reset spreadsheet
-        worksheet = spreadsheet.load(bc_number)
+        bc_spreadsheet = spreadsheet.load(bc_number)
         print("Spreadsheet loaded")
 
-        # Add to Google Spreadsheet
-        spreadsheet.add_worksheet(worksheet, order_items_per_user)
+        spreadsheet.update(bc_spreadsheet, bc_number, order_items_per_user)
+
+        print("Spreadsheet updated")
 
         print("Finished")
     else:

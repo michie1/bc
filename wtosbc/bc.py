@@ -34,7 +34,7 @@ def login(s: Session) -> None:
 def get_product(s: Session, post_item: PostItem) -> Optional[Product]:
     data: Product = {
         "id": "",
-        "name": bytes(),
+        "name": "",
         "qty": "",
         "pa": "",
         "type": "",
@@ -54,7 +54,6 @@ def get_product(s: Session, post_item: PostItem) -> Optional[Product]:
             .text.replace(" - bike-components", "")
             .replace("buy online", "")
             .replace("online kaufen", "")
-            .encode("utf-8")
         )
         data["qty"] = str(post_item["qty"])  # TODO: store as int?
         data["pa"] = post_item["pa"]
