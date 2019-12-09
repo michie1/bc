@@ -34,21 +34,19 @@ def get_document(session: Session, url: str) -> Document:
 
 
 # Retrieve data about product in order to POST
-def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
-
-    # TODO: divide extracting data and converting data into 2 functions
+def get_product(document: Document, post_item: PostItem) -> Optional[Product]:
     try:
-        (type_id, price) = get_option(post_item["type"], doc)
+        (type_id, price) = get_option(post_item["type"], document)
 
         return {
-            "id": get_product_id(doc),
-            "name": get_product_name(doc.cssselect("title")[0].text),
+            "id": get_product_id(document),
+            "name": get_product_name(document.cssselect("title")[0].text),
             "qty": post_item["qty"],
             "pa": post_item["pa"],
             "type": post_item["type"],
             "price": price,
             "type_id": type_id,
-            "token": get_product_token(doc),
+            "token": get_product_token(document),
         }
 
     except IndexError as e:
