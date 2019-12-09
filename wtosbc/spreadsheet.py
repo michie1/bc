@@ -88,9 +88,9 @@ def get_cells(orders: OrderItemsPerUser) -> Cells:
                     continue
 
                 try:
-                    (cells[row_number * 10 + 0], cells[row_number * 10 + 1],) = (
-                        product["name"].decode("utf-8").split(" ", 1)
-                    )
+                    (cells[row_number * 10 + 0], cells[row_number * 10 + 1]) = product[
+                        "name"
+                    ].split(" ", 1)
                 except IndexError as e:
                     print("index error", e)
                     print(user, product)
