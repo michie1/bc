@@ -3,18 +3,16 @@ import json
 import time
 from wtosbc import config
 from wtosbc.custom_types import *
-from typing import Optional, cast
+from typing import Optional, cast, Any
 
 
-def login(s: Session) -> None:
-    r = s.get("https://www.bike-components.de/en/")
-    r = s.get("https://www.bike-components.de/en/light-login/")
-
-    doc = lxml.html.document_fromstring(r.text)
+def login(session: Session) -> None:
+    session.get("https://www.bike-components.de/en/")
+    doc = get_document(session, "https://www.bike-components.de/en/light-login/")
     token = doc.cssselect('input[name="login[_token]"]')[0].value
     print("Token retrieved: ", token)
 
-    r = s.post(
+    response = session.post(
         "https://www.bike-components.de/en/light-login/",
         data={
             "login[email]": config.email,
@@ -24,85 +22,15 @@ def login(s: Session) -> None:
         },
     )
 
-    if r.text.find("Mein Konto") == -1:
+    if response.text.find("Mein Konto") == -1:
         print("Not logged in")
         exit()
     print("Logged in")
 
 
-# Retrieve data about product in order to POST
-def get_product(s: Session, post_item: PostItem) -> Optional[Product]:
-    data: Product = {
-        "id": "",
-        "name": "",
-        "qty": "",
-        "pa": "",
-        "type": "",
-        "price": 0,
-        "type_id": "",
-        "token": "",
-    }
-
-    r = s.get(post_item["url"])
-    doc = lxml.html.document_fromstring(r.text)
-
-    # TODO: divide getting data from url, extracting data and converting data into 3 functions
-    try:
-        data["id"] = doc.cssselect('input[name="products_id"]')[0].get("value")
-        data["name"] = (
-            doc.cssselect("title")[0]
-            .text.replace(" - bike-components", "")
-            .replace("buy online", "")
-            .replace("online kaufen", "")
-        )
-        data["qty"] = str(post_item["qty"])  # TODO: store as int?
-        data["pa"] = post_item["pa"]
-
-        type_index = 0
-        options = doc.cssselect("option[data-price]")
-
-        ## TODO: move this if / else into own function for extracting price and type_id
-        if post_item["type"] == "":
-            option = options[type_index]
-            option_type_name = get_option_type_name(option.text_content())
-        else:
-            option = options[type_index]
-            option_type_name = get_option_type_name(option.text_content())
-
-            # Originally we had to remove the last character, but BC changed something
-            # so now we do two comparisons, with and without the last character.
-            while (
-                post_item["type"] != option_type_name[0:-1]
-                and post_item["type"] != option_type_name
-            ):
-                type_index += 1
-                option = options[type_index]
-                option_type_name = get_option_type_name(option.text_content())
-
-        data["type"] = post_item["type"]
-        data["price"] = float(
-            option.get("data-price")[0:-1].replace(",", ".")
-        )  # remove last euro char
-        data["type_id"] = option.get("value")
-
-        data["token"] = doc.cssselect("body")[0].get("data-csrf-token")
-
-        return data
-
-    except IndexError as e:
-        print("Item/type does not exist?")
-        print(e)
-        print(data)
-        return None
-
-
-def get_option_type_name(text_content: str) -> str:
-    return text_content.split("|")[0].strip()
-
-
 # Add a product to the cart
-def add_product(s: Session, data: Product) -> None:
-    r = s.post(
+def add_product(session: Session, data: Product) -> None:
+    response = session.post(
         "https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1",
         data={
             "products_id": data["id"],
@@ -113,17 +41,18 @@ def add_product(s: Session, data: Product) -> None:
         },
     )
 
-    if json.loads(r.text)["action"] != "ok":
+    if json.loads(response.text)["action"] != "ok":
         print("Product could not be added to the cart")
         exit()
 
 
 # add price alert voucher
 def add_pa(session: Session, orders: OrderItemsPerUser) -> None:
-    r = session.get("https://www.bike-components.de/en/checkout/finalize/")
-    doc = lxml.html.document_fromstring(r.text)
+    document = get_document(
+        session, "https://www.bike-components.de/en/checkout/finalize/"
+    )
 
-    voucher_token = doc.cssselect("#voucher__token")[0].get("value")
+    voucher_token = document.cssselect("#voucher__token")[0].get("value")
     print("voucher_token retrieved: ", voucher_token)
 
     # adding price alerts
@@ -133,18 +62,18 @@ def add_pa(session: Session, orders: OrderItemsPerUser) -> None:
                 continue
 
             if product["pa"] != "":
-                r = session.post(
+                response = session.post(
                     "https://www.bike-components.de/en/checkout/finalize/",
                     data={
                         "voucher[voucher_code]": product["pa"],
                         "voucher[_token]": voucher_token,
                     },
                 )
-                doc = lxml.html.document_fromstring(r.text)
+                document = lxml.html.document_fromstring(response.text)
 
                 try:
                     pa_price = (
-                        doc.cssselect(
+                        document.cssselect(
                             'div.row [data-voucher-code="' + product["pa"] + '"]'
                         )[0]
                         .getparent()
@@ -163,12 +92,11 @@ def add_pa(session: Session, orders: OrderItemsPerUser) -> None:
             time.sleep(1)
 
 
-def remove_product(s: Session, product_id: str, type_id: str) -> None:
-    r = s.get("https://www.bike-components.de/shopping_cart.php")
-    doc = lxml.html.document_fromstring(r.text)
-    token = doc.cssselect("body")[0].get("data-csrf-token")
+def remove_product(session: Session, product_id: str, type_id: str) -> None:
+    document = get_document(session, "https://www.bike-components.de/shopping_cart.php")
+    token = document.cssselect("body")[0].get("data-csrf-token")
 
-    r = s.post(
+    session.post(
         "https://www.bike-components.de/callback/cart_update.php",
         data={
             "cart_delete[]": product_id + "-" + type_id,
@@ -190,7 +118,8 @@ def add_cart(
     for user, post_items in post_items_per_user.items():
         for pi, post_item in enumerate(post_items):
             if post_item is not None:
-                product = get_product(session, post_item)
+                document = get_document(session, post_item["url"])
+                product = get_product(document, post_item)
                 if product is not None:
                     add_product(session, product)
 
@@ -241,14 +170,13 @@ def remove_cart(session: Session, order_items_per_user: OrderItemsPerUser) -> No
     print("Removed items from cart")
 
 
-def clear_cart(s: Session) -> None:
+def clear_cart(session: Session) -> None:
     # Get cart
-    r = s.get("https://www.bike-components.de/shopping_cart.php")
-    doc = lxml.html.document_fromstring(r.text)
-    token = doc.cssselect("body")[0].get("data-csrf-token")
+    document = get_document(session, "https://www.bike-components.de/shopping_cart.php")
+    token = document.cssselect("body")[0].get("data-csrf-token")
 
-    for product in doc.cssselect('input[name="products_id[]"]'):
-        r = s.post(
+    for product in document.cssselect('input[name="products_id[]"]'):
+        session.post(
             "https://www.bike-components.de/callback/cart_update.php",
             data={
                 "cart_delete[]": product.get("value"),
@@ -256,3 +184,79 @@ def clear_cart(s: Session) -> None:
                 "_token": token,
             },
         )
+
+
+def get_option(post_item_type: str, doc: Document) -> Any:
+    type_index = 0
+    options = doc.cssselect("option[data-price]")
+
+    if post_item_type == "":
+        option = options[type_index]
+        option_type_name = get_option_type_name(option.text_content())
+    else:
+        option = options[type_index]
+        option_type_name = get_option_type_name(option.text_content())
+
+        # Originally we had to remove the last character, but BC changed something
+        # so now we do two comparisons, with and without the last character.
+        while (
+            post_item_type != option_type_name[0:-1]
+            and post_item_type != option_type_name
+        ):
+            type_index += 1
+            option = options[type_index]
+            option_type_name = get_option_type_name(option.text_content())
+
+    price = float(
+        option.get("data-price")[0:-1].replace(",", ".")
+    )  # remove last euro char
+
+    type_id = option.get("value")
+
+    return (type_id, price)
+
+
+def get_option_type_name(text_content: str) -> str:
+    return text_content.split("|")[0].strip()
+
+
+def get_document(session: Session, url: str) -> Document:
+    response = session.get(url)
+    return lxml.html.document_fromstring(response.text)
+
+
+def get_product(document: Document, post_item: PostItem) -> Optional[Product]:
+    try:
+        (type_id, price) = get_option(post_item["type"], document)
+
+        return {
+            "id": get_product_id(document),
+            "name": get_product_name(document.cssselect("title")[0].text),
+            "qty": post_item["qty"],
+            "pa": post_item["pa"],
+            "type": post_item["type"],
+            "price": price,
+            "type_id": type_id,
+            "token": get_product_token(document),
+        }
+
+    except IndexError as e:
+        print("Item/type does not exist?")
+        print(e)
+        return None
+
+
+def get_product_id(document: Document) -> str:
+    return cast(str, document.cssselect('input[name="products_id"]')[0].get("value"))
+
+
+def get_product_token(document: Document) -> str:
+    return cast(str, document.cssselect("body")[0].get("data-csrf-token"))
+
+
+def get_product_name(title: str) -> str:
+    return (
+        title.replace(" - bike-components", "")
+        .replace("buy online", "")
+        .replace("online kaufen", "")
+    )
