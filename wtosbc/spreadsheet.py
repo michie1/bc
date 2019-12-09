@@ -7,8 +7,6 @@ from typing import Any
 from wtosbc import config
 from wtosbc.custom_types import *
 
-Worksheet = Any
-
 
 def create_sheet(bc_number: int) -> None:
     print("Load Google credentials")
@@ -24,35 +22,39 @@ def create_sheet(bc_number: int) -> None:
     sh.add_worksheet(title="BC" + str(bc_number), rows="1", cols="1")
 
 
-def load(bc_number: int) -> Worksheet:
+def load(bc_number: int) -> Spreadsheet:
     print("Load Google credentials")
     scope = ["https://spreadsheets.google.com/feeds"]
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
         "wtosbc/credentials.json", scope
     )
 
-    gc = gspread.authorize(credentials)
-    sh = gc.open_by_key(config.spreadsheet_key)
+    client = gspread.authorize(credentials)
+    bc_spreadsheet = client.open_by_key(config.spreadsheet_key)
+    bc_spreadsheet.worksheets()  # problem if this is removed
 
-    sh.worksheets()  # problem if this is removed
-    sh.add_worksheet(title="0", rows="1", cols="1")
+    return bc_spreadsheet
+
+
+def reset(bc_spreadsheet: Spreadsheet, bc_number: int) -> None:
+    bc_spreadsheet.add_worksheet(title="0", rows="1", cols="1")
 
     try:
         # delete worksheet
-        sh.del_worksheet(sh.worksheet("BC" + str(bc_number)))
+        bc_spreadsheet.del_worksheet(bc_spreadsheet.worksheet("BC" + str(bc_number)))
     except gspread.exceptions.WorksheetNotFound as err:
         print(err)
 
-    # TODO: Extract load/setup from add worksheet
-    # make worksheet
-    worksheet = sh.add_worksheet(title="BC" + str(bc_number), rows="200", cols="10")
-
-    sh.del_worksheet(sh.worksheet("0"))
-
-    return worksheet
+    bc_spreadsheet.del_worksheet(bc_spreadsheet.worksheet("0"))
 
 
-def add_worksheet(worksheet: Worksheet, orders: OrderItemsPerUser) -> None:
+def add_worksheet(bc_spreadsheet: Spreadsheet, bc_number: int) -> Worksheet:
+    return bc_spreadsheet.add_worksheet(
+        title="BC" + str(bc_number), rows="200", cols="10"
+    )
+
+
+def update_worksheet(worksheet: Worksheet, orders: OrderItemsPerUser) -> None:
     # TODO: retrieve cells from parameter
 
     cell_list = worksheet.range("A1:J%s" % 200)

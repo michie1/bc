@@ -52,3 +52,6 @@ class Post(TypedDict):
 
 
 Posts = List[Post]
+
+Worksheet = Any
+Spreadsheet = Any
