@@ -30,8 +30,13 @@ def login(s: Session) -> None:
     print("Logged in")
 
 
+def get_document(session: Session, url: str) -> Document:
+    response = session.get(url)
+    return lxml.html.document_fromstring(response.text)
+
+
 # Retrieve data about product in order to POST
-def get_product(s: Session, post_item: PostItem) -> Optional[Product]:
+def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
     data: Product = {
         "id": "",
         "name": "",
@@ -43,10 +48,7 @@ def get_product(s: Session, post_item: PostItem) -> Optional[Product]:
         "token": "",
     }
 
-    r = s.get(post_item["url"])
-    doc = lxml.html.document_fromstring(r.text)
-
-    # TODO: divide getting data from url, extracting data and converting data into 3 functions
+    # TODO: divide extracting data and converting data into 2 functions
     try:
         data["id"] = doc.cssselect('input[name="products_id"]')[0].get("value")
         data["name"] = (
@@ -190,7 +192,8 @@ def add_cart(
     for user, post_items in post_items_per_user.items():
         for pi, post_item in enumerate(post_items):
             if post_item is not None:
-                product = get_product(session, post_item)
+                document = get_document(session, post_item["url"])
+                product = get_product(document, post_item)
                 if product is not None:
                     add_product(session, product)
 
