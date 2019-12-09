@@ -6,15 +6,13 @@ from wtosbc.custom_types import *
 from typing import Optional, cast
 
 
-def login(s: Session) -> None:
-    r = s.get("https://www.bike-components.de/en/")
-    r = s.get("https://www.bike-components.de/en/light-login/")
-
-    doc = lxml.html.document_fromstring(r.text)
+def login(session: Session) -> None:
+    session.get("https://www.bike-components.de/en/")
+    doc = get_document(session, "https://www.bike-components.de/en/light-login/")
     token = doc.cssselect('input[name="login[_token]"]')[0].value
     print("Token retrieved: ", token)
 
-    r = s.post(
+    response = session.post(
         "https://www.bike-components.de/en/light-login/",
         data={
             "login[email]": config.email,
@@ -24,7 +22,7 @@ def login(s: Session) -> None:
         },
     )
 
-    if r.text.find("Mein Konto") == -1:
+    if response.text.find("Mein Konto") == -1:
         print("Not logged in")
         exit()
     print("Logged in")
@@ -37,7 +35,7 @@ def get_document(session: Session, url: str) -> Document:
 
 # Retrieve data about product in order to POST
 def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
-    data: Product = {
+    product: Product = {
         "id": "",
         "name": "",
         "qty": "",
@@ -50,15 +48,15 @@ def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
 
     # TODO: divide extracting data and converting data into 2 functions
     try:
-        data["id"] = doc.cssselect('input[name="products_id"]')[0].get("value")
-        data["name"] = (
+        product["id"] = doc.cssselect('input[name="products_id"]')[0].get("value")
+        product["name"] = (
             doc.cssselect("title")[0]
             .text.replace(" - bike-components", "")
             .replace("buy online", "")
             .replace("online kaufen", "")
         )
-        data["qty"] = str(post_item["qty"])  # TODO: store as int?
-        data["pa"] = post_item["pa"]
+        product["qty"] = str(post_item["qty"])  # TODO: store as int?
+        product["pa"] = post_item["pa"]
 
         type_index = 0
         options = doc.cssselect("option[data-price]")
@@ -81,20 +79,20 @@ def get_product(doc: Document, post_item: PostItem) -> Optional[Product]:
                 option = options[type_index]
                 option_type_name = get_option_type_name(option.text_content())
 
-        data["type"] = post_item["type"]
-        data["price"] = float(
+        product["type"] = post_item["type"]
+        product["price"] = float(
             option.get("data-price")[0:-1].replace(",", ".")
         )  # remove last euro char
-        data["type_id"] = option.get("value")
+        product["type_id"] = option.get("value")
 
-        data["token"] = doc.cssselect("body")[0].get("data-csrf-token")
+        product["token"] = doc.cssselect("body")[0].get("data-csrf-token")
 
-        return data
+        return product
 
     except IndexError as e:
         print("Item/type does not exist?")
         print(e)
-        print(data)
+        print(product)
         return None
 
 
@@ -103,8 +101,8 @@ def get_option_type_name(text_content: str) -> str:
 
 
 # Add a product to the cart
-def add_product(s: Session, data: Product) -> None:
-    r = s.post(
+def add_product(session: Session, data: Product) -> None:
+    response = session.post(
         "https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1",
         data={
             "products_id": data["id"],
@@ -115,17 +113,18 @@ def add_product(s: Session, data: Product) -> None:
         },
     )
 
-    if json.loads(r.text)["action"] != "ok":
+    if json.loads(response.text)["action"] != "ok":
         print("Product could not be added to the cart")
         exit()
 
 
 # add price alert voucher
 def add_pa(session: Session, orders: OrderItemsPerUser) -> None:
-    r = session.get("https://www.bike-components.de/en/checkout/finalize/")
-    doc = lxml.html.document_fromstring(r.text)
+    document = get_document(
+        session, "https://www.bike-components.de/en/checkout/finalize/"
+    )
 
-    voucher_token = doc.cssselect("#voucher__token")[0].get("value")
+    voucher_token = document.cssselect("#voucher__token")[0].get("value")
     print("voucher_token retrieved: ", voucher_token)
 
     # adding price alerts
@@ -135,18 +134,18 @@ def add_pa(session: Session, orders: OrderItemsPerUser) -> None:
                 continue
 
             if product["pa"] != "":
-                r = session.post(
+                response = session.post(
                     "https://www.bike-components.de/en/checkout/finalize/",
                     data={
                         "voucher[voucher_code]": product["pa"],
                         "voucher[_token]": voucher_token,
                     },
                 )
-                doc = lxml.html.document_fromstring(r.text)
+                document = lxml.html.document_fromstring(response.text)
 
                 try:
                     pa_price = (
-                        doc.cssselect(
+                        document.cssselect(
                             'div.row [data-voucher-code="' + product["pa"] + '"]'
                         )[0]
                         .getparent()
@@ -165,12 +164,11 @@ def add_pa(session: Session, orders: OrderItemsPerUser) -> None:
             time.sleep(1)
 
 
-def remove_product(s: Session, product_id: str, type_id: str) -> None:
-    r = s.get("https://www.bike-components.de/shopping_cart.php")
-    doc = lxml.html.document_fromstring(r.text)
-    token = doc.cssselect("body")[0].get("data-csrf-token")
+def remove_product(session: Session, product_id: str, type_id: str) -> None:
+    document = get_document(session, "https://www.bike-components.de/shopping_cart.php")
+    token = document.cssselect("body")[0].get("data-csrf-token")
 
-    r = s.post(
+    session.post(
         "https://www.bike-components.de/callback/cart_update.php",
         data={
             "cart_delete[]": product_id + "-" + type_id,
@@ -244,14 +242,13 @@ def remove_cart(session: Session, order_items_per_user: OrderItemsPerUser) -> No
     print("Removed items from cart")
 
 
-def clear_cart(s: Session) -> None:
+def clear_cart(session: Session) -> None:
     # Get cart
-    r = s.get("https://www.bike-components.de/shopping_cart.php")
-    doc = lxml.html.document_fromstring(r.text)
-    token = doc.cssselect("body")[0].get("data-csrf-token")
+    document = get_document(session, "https://www.bike-components.de/shopping_cart.php")
+    token = document.cssselect("body")[0].get("data-csrf-token")
 
-    for product in doc.cssselect('input[name="products_id[]"]'):
-        r = s.post(
+    for product in document.cssselect('input[name="products_id[]"]'):
+        session.post(
             "https://www.bike-components.de/callback/cart_update.php",
             data={
                 "cart_delete[]": product.get("value"),
