@@ -7,7 +7,7 @@ from wtosbc import wtos
 Snapshot = Any
 
 
-def test_load_orders(snapshot: Snapshot) -> None:
+def test_get_post_items_per_user(snapshot: Snapshot) -> None:
     bc_number = 150
     posts = load_test_posts()
     post_items_per_user = wtos.get_post_items_per_user(bc_number, posts)
