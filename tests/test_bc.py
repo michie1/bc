@@ -7,7 +7,7 @@ from wtosbc import wtos
 def test_load_orders(snapshot):
     bc_number = "150"
     posts = load_test_posts()
-    orders = wtos.get_orders(bc_number, posts)
+    orders = wtos.get_post_items_per_user(bc_number, posts)
     snapshot.assert_match(orders)
 
 
