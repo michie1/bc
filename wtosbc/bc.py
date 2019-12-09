@@ -28,49 +28,6 @@ def login(session: Session) -> None:
     print("Logged in")
 
 
-def get_document(session: Session, url: str) -> Document:
-    response = session.get(url)
-    return lxml.html.document_fromstring(response.text)
-
-
-# Retrieve data about product in order to POST
-def get_product(document: Document, post_item: PostItem) -> Optional[Product]:
-    try:
-        (type_id, price) = get_option(post_item["type"], document)
-
-        return {
-            "id": get_product_id(document),
-            "name": get_product_name(document.cssselect("title")[0].text),
-            "qty": post_item["qty"],
-            "pa": post_item["pa"],
-            "type": post_item["type"],
-            "price": price,
-            "type_id": type_id,
-            "token": get_product_token(document),
-        }
-
-    except IndexError as e:
-        print("Item/type does not exist?")
-        print(e)
-        return None
-
-
-def get_product_id(document: Document) -> str:
-    return cast(str, document.cssselect('input[name="products_id"]')[0].get("value"))
-
-
-def get_product_token(document: Document) -> str:
-    return cast(str, document.cssselect("body")[0].get("data-csrf-token"))
-
-
-def get_product_name(title: str) -> str:
-    return (
-        title.replace(" - bike-components", "")
-        .replace("buy online", "")
-        .replace("online kaufen", "")
-    )
-
-
 # Add a product to the cart
 def add_product(session: Session, data: Product) -> None:
     response = session.post(
@@ -261,3 +218,45 @@ def get_option(post_item_type: str, doc: Document) -> Any:
 
 def get_option_type_name(text_content: str) -> str:
     return text_content.split("|")[0].strip()
+
+
+def get_document(session: Session, url: str) -> Document:
+    response = session.get(url)
+    return lxml.html.document_fromstring(response.text)
+
+
+def get_product(document: Document, post_item: PostItem) -> Optional[Product]:
+    try:
+        (type_id, price) = get_option(post_item["type"], document)
+
+        return {
+            "id": get_product_id(document),
+            "name": get_product_name(document.cssselect("title")[0].text),
+            "qty": post_item["qty"],
+            "pa": post_item["pa"],
+            "type": post_item["type"],
+            "price": price,
+            "type_id": type_id,
+            "token": get_product_token(document),
+        }
+
+    except IndexError as e:
+        print("Item/type does not exist?")
+        print(e)
+        return None
+
+
+def get_product_id(document: Document) -> str:
+    return cast(str, document.cssselect('input[name="products_id"]')[0].get("value"))
+
+
+def get_product_token(document: Document) -> str:
+    return cast(str, document.cssselect("body")[0].get("data-csrf-token"))
+
+
+def get_product_name(title: str) -> str:
+    return (
+        title.replace(" - bike-components", "")
+        .replace("buy online", "")
+        .replace("online kaufen", "")
+    )
