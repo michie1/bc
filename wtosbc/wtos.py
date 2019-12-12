@@ -78,66 +78,67 @@ def get_post_items_per_user(bc_number: int, posts: Posts) -> PostItemsPerUser:
         elif content[2:11] == str(bc_number) + " start":  # current start
             print("start")
         elif content[2:5] == str(bc_number):  # BC123
-            if user not in post_items_per_user:
-                post_items_per_user[user] = []
-            lines = content.split("\n")[1:]
-            for line in lines:
-                line = (
-                    line.replace("\u00a0", " ")
-                    .replace("<strong>", "[b]")
-                    .replace("</strong>", "[/b]")
-                )
-
-                if (
-                    line == ""
-                    or line == "&nbsp;"
-                    or (line[0] == "-" and line[-1] == "-")
-                ):
-                    continue
-
-                if line == "---" or line == "--" or line == "—":
-                    break
-
-                if line == "WTOS":
-                    if user == bc_chef:
-                        user = "WTOS"
-                        post_items_per_user[user] = []
-                    break
-
-                try:
-                    product_qty_str, product = line.split("x ", 1)
-                    product_qty = int(product_qty_str.strip())
-                except ValueError as e:
-                    print("ValueError")
-                    print(e)
-                    print(line)
-                    continue
-
-                if product_qty > 0:
-                    (product_url, type_pa) = split_url_type_pa(product)
-
-                    if "bike-components.de" in product_url:
-                        (product_type, product_pa) = split_type_pa(type_pa)
-
-                        # fix for " in type
-                        product_type = (
-                            product_type.replace("&quot;", '"')
-                            .replace("&nbsp;", "")
-                            .strip()
-                        )
-
-                        post_items_per_user[user].append(
-                            {
-                                "url": product_url,
-                                "type": product_type,
-                                "qty": product_qty,
-                                "pa": product_pa,
-                            }
-                        )
-                    else:
-                        print("Wrong url: ", product_url)
+            extract_post_items(content, user, post_items_per_user)
 
     return post_items_per_user
+
+
+def extract_post_items(
+    content: str, user: str, post_items_per_user: PostItemsPerUser
+) -> None:
+    bc_chef = config.bc_chef
+    if user not in post_items_per_user:
+        post_items_per_user[user] = []
+    lines = content.split("\n")[1:]
+    for line in lines:
+        line = (
+            line.replace("\u00a0", " ")
+            .replace("<strong>", "[b]")
+            .replace("</strong>", "[/b]")
+        )
+
+        if line == "" or line == "&nbsp;" or (line[0] == "-" and line[-1] == "-"):
+            continue
+
+        if line == "---" or line == "--" or line == "—":
+            break
+
+        if line == "WTOS":
+            if user == bc_chef:
+                user = "WTOS"
+                post_items_per_user[user] = []
+            break
+
+        try:
+            product_qty_str, product = line.split("x ", 1)
+            product_qty = int(product_qty_str.strip())
+        except ValueError as e:
+            print("ValueError")
+            print(e)
+            print(line)
+            continue
+
+        if product_qty > 0:
+            (product_url, type_pa) = split_url_type_pa(product)
+
+            if "bike-components.de" in product_url:
+                (product_type, product_pa) = split_type_pa(type_pa)
+
+                # fix for " in type
+                product_type = (
+                    product_type.replace("&quot;", '"').replace("&nbsp;", "").strip()
+                )
+
+                post_items_per_user[user].append(
+                    {
+                        "url": product_url,
+                        "type": product_type,
+                        "qty": product_qty,
+                        "pa": product_pa,
+                    }
+                )
+            else:
+                print("Wrong url: ", product_url)
 
 
 def split_url_type_pa(product: str) -> Tuple[str, str]:
