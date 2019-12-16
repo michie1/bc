@@ -6,7 +6,7 @@ import json
 import ssl
 from typing import cast, Tuple
 
-from wtosbc import config, spreadsheet
+from wtosbc import config, spreadsheet, state
 from wtosbc.custom_types import *
 
 ctx = ssl.create_default_context()
@@ -14,39 +14,9 @@ ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
 
-# Move to state.py
-def set_bc_number(number: int) -> None:
-    print("Set bc number")
-    with open("wtosbc/state.json", "r") as file_read:
-        data = json.load(file_read)
-        with open("wtosbc/state.json", "w") as file_write:
-            data["number"] = number
-            json.dump(data, file_write)
-
-
 def create_sheet(number: int) -> None:
     print("create sheet")
     spreadsheet.create_sheet(number)
-
-
-# Move to state.py
-def set_state_pa() -> None:
-    print("set PA state")
-    with open("wtosbc/state.json", "r") as file_read:
-        data = json.load(file_read)
-        with open("wtosbc/state.json", "w") as file_write:
-            data["state"] = True
-            json.dump(data, file_write)
-
-
-# Move to state.py
-def reset_state_pa() -> None:
-    print("reset PA state")
-    with open("wtosbc/state.json", "r") as file_read:
-        data = json.load(file_read)
-        with open("wtosbc/state.json", "w") as file_write:
-            data["state"] = False
-            json.dump(data, file_write)
 
 
 def load_posts(bc_number: int) -> Posts:
@@ -75,7 +45,7 @@ def get_post_items_per_user(bc_number: int, posts: Posts) -> PostItemsPerUser:
         elif content[2:11] == str(bc_number + 1) + " PA":  # next start
             # TODO: Check if you can do this outside this function
             if user == bc_chef:
-                set_state_pa()
+                state.enable_pa_state()
                 break
 
     return post_items_per_user
