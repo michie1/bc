@@ -128,19 +128,18 @@ def split_url_type_pa(product: str) -> Tuple[str, str]:
 
 
 def split_type_pa(type_pa: str) -> Tuple[str, str]:
-    strong = type_pa.split("[b]")
+    bold = type_pa.strip().split("[b]")
 
-    if len(strong) == 2:
-        # type and PA exists
-        product_type = strong[0].strip()
-        product_pa = strong[1].replace("[/b]", "").strip()
+    if len(bold) == 1:
+        # only type exists
+        product_type = type_pa.strip()
+        product_pa = ""
     else:
-        # type or PA
-        if type_pa[0:8] == "<strong>":
-            product_pa = type_pa[8:-9]
+        if bold[0].strip() == "":  # only PA exists
             product_type = ""
-        else:
-            product_type = type_pa
-            product_pa = ""
+            product_pa = bold[1].replace("[/b]", "").strip()
+        else:  # type and PA exists
+            product_type = bold[0].strip()
+            product_pa = bold[1].replace("[/b]", "").strip()
 
     return (product_type, product_pa)
