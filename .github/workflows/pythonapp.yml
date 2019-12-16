@@ -1,4 +1,4 @@
-name: Python application
+name: BC
 
 on: [push]
 
@@ -19,6 +19,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e .
-    - name: Test with pytest
+    - name: Test
       run: |
-        pytest
+        pip install pytest-cov
+        pytest --cov=wtosbc tests/ --cov-report=xml
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.codecov_token }}
+        file: ./coverage.xml
+        fail_ci_if_error: true
