@@ -144,6 +144,7 @@ def add_cart(
     return order_items_per_user
 
 
+# Move to state.py
 def read_state() -> State:
     with open("wtosbc/state.json", "r") as file_read:
         data = json.load(file_read)
@@ -166,8 +167,6 @@ def remove_cart(session: Session, order_items_per_user: OrderItemsPerUser) -> No
                         state["pa"],
                     )
                     remove_product(session, order_item["id"], order_item["type_id"])
-
-    print("Removed items from cart")
 
 
 def clear_cart(session: Session) -> None:

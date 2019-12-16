@@ -14,8 +14,9 @@ ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
 
-def increment_bc_number(number: int) -> None:
-    print("increment bc number")
+# Move to state.py
+def set_bc_number(number: int) -> None:
+    print("Set bc number")
     with open("wtosbc/state.json", "r") as file_read:
         data = json.load(file_read)
         with open("wtosbc/state.json", "w") as file_write:
@@ -23,11 +24,12 @@ def increment_bc_number(number: int) -> None:
             json.dump(data, file_write)
 
 
-def create_next_sheet(number: int) -> None:
-    print("create next sheet")
+def create_sheet(number: int) -> None:
+    print("create sheet")
     spreadsheet.create_sheet(number)
 
 
+# Move to state.py
 def set_state_pa() -> None:
     print("set PA state")
     with open("wtosbc/state.json", "r") as file_read:
@@ -37,6 +39,7 @@ def set_state_pa() -> None:
             json.dump(data, file_write)
 
 
+# Move to state.py
 def reset_state_pa() -> None:
     print("reset PA state")
     with open("wtosbc/state.json", "r") as file_read:
@@ -63,24 +66,30 @@ def get_post_items_per_user(bc_number: int, posts: Posts) -> PostItemsPerUser:
         content = post["post_content"]
         user = post["display_name"]
 
-        if content[2:11] == str(int(bc_number) + 1) + " start":  # next start
-            # TODO: Check if you can do this outside/before this function
-            if user == bc_chef:
-                increment_bc_number(bc_number + 1)
-                reset_state_pa()
-                create_next_sheet(bc_number + 1)
-                break
-        elif content[2:11] == str(bc_number + 1) + " PA":  # next start
-            # TODO: Check if you can do this outside/before this function
-            if user == bc_chef:
-                set_state_pa()
-                break
-        elif content[2:11] == str(bc_number) + " start":  # current start
+        if content[2:11] == str(bc_number) + " start":  # current start
             print("start")
         elif content[2:5] == str(bc_number):  # BC123
             extract_post_items(content, user, post_items_per_user)
+        elif is_next_start_post(post, bc_number, bc_chef):
+            break
+        elif content[2:11] == str(bc_number + 1) + " PA":  # next start
+            # TODO: Check if you can do this outside this function
+            if user == bc_chef:
+                set_state_pa()
+                break
 
     return post_items_per_user
+
+
+def has_next_post(posts: Posts, bc_number: int, bc_chef: str) -> bool:
+    return any(is_next_start_post(post, bc_number, bc_chef) for post in posts)
+
+
+def is_next_start_post(post: Post, bc_number: int, bc_chef: str) -> bool:
+    content = post["post_content"]
+    user = post["display_name"]
+
+    return content[2:11] == str(bc_number + 1) + " start" and user == bc_chef
 
 
 def extract_post_items(
