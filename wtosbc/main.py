@@ -4,12 +4,12 @@ from lxml.etree import fromstring
 import lxml.html
 from lxml import etree
 import json
-from wtosbc import config, wtos, spreadsheet, bc
+from wtosbc import config, wtos, spreadsheet, bc, state
 
 
 def go() -> None:
     bc_chef = config.bc_chef
-    bc_number = load_bc_number()
+    bc_number = state.load_bc_number()
     session = requests.Session()
 
     print("Session started")
@@ -49,16 +49,9 @@ def go() -> None:
 
 
 def start_next_order(next_bc_number: int) -> None:
-    wtos.set_bc_number(next_bc_number)
-    wtos.reset_state_pa()
+    state.set_bc_number(next_bc_number)
+    state.disable_pa_state()
     spreadsheet.create_sheet(next_bc_number)
-
-
-# Move to state.py
-def load_bc_number() -> int:
-    with open("wtosbc/state.json", "r") as fp:
-        data = json.load(fp)
-        return int(data["number"])
 
 
 if __name__ == "__main__":
