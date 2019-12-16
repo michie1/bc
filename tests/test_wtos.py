@@ -24,6 +24,13 @@ def test_has_next_post() -> None:
     assert wtos.has_next_post(posts, bc_number, bc_chef)
 
 
+def test_split_type_pa() -> None:
+    assert wtos.split_type_pa("") == ("", "")
+    assert wtos.split_type_pa("type") == ("type", "")
+    assert wtos.split_type_pa("[b]pa[/b]") == ("", "pa")
+    assert wtos.split_type_pa("type [b]pa[/b]") == ("type", "pa")
+
+
 def load_test_posts() -> Posts:
     with open("tests/posts_150.json") as test_posts:
         return cast(Posts, json.loads(test_posts.read()))
