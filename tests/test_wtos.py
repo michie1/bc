@@ -14,6 +14,38 @@ def test_get_post_items_per_user(snapshot: Snapshot) -> None:
     snapshot.assert_match(post_items_per_user)
 
 
+def test_get_post_items_per_user_wrong_url() -> None:
+    bc_number = 150
+    assert wtos.get_post_items_per_user(
+        bc_number,
+        [{"display_name": "test_user", "post_content": "BC150\n1x http://wrong_url"}],
+    ) == {"test_user": []}
+
+
+def test_get_post_items_per_user_wtos_user() -> None:
+    bc_number = 150
+    post_items_per_user = wtos.get_post_items_per_user(
+        bc_number,
+        [
+            {
+                "display_name": "Rutger Nugteren",
+                "post_content": "BC150\nWTOS\n2x https://www.bike-components.de/en/Axa/RLC-100-Plug-In-Cable-Saddle-Bag-p54054/black-universal-o200001",
+            }
+        ],
+    )
+    expected = {
+        "WTOS": [
+            {
+                "url": "https://www.bike-components.de/en/Axa/RLC-100-Plug-In-Cable-Saddle-Bag-p54054/black-universal-o200001",
+                "type": "",
+                "qty": 2,
+                "pa": "",
+            }
+        ]
+    }
+    assert post_items_per_user == expected
+
+
 def test_has_next_post() -> None:
     bc_chef = "Tim van Rugge"
     bc_number = 150

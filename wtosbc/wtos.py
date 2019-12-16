@@ -86,7 +86,9 @@ def extract_post_items(
             if user == bc_chef:
                 user = "WTOS"
                 post_items_per_user[user] = []
-            break
+                if len(post_items_per_user[bc_chef]) == 0:
+                    del post_items_per_user[bc_chef]
+                continue
 
         try:
             product_qty_str, product = line.split("x ", 1)
