@@ -12,9 +12,10 @@ class OrderItem(TypedDict):
     price: float
     original_price: float
     name: str
+    token: str
 
 
-OrderItemsPerUser = Dict[str, List[Optional[OrderItem]]]
+OrderItemsPerUser = Dict[str, List[OrderItem]]
 
 
 class State(TypedDict):
@@ -32,6 +33,16 @@ class Product(TypedDict):
     price: float
     type_id: str
     token: str
+
+
+class Payload(TypedDict):
+    id: str
+    type_id: str
+    quantity: int
+    token: str
+
+
+Payloads = List[Payload]
 
 
 class PostItem(TypedDict):

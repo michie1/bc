@@ -3,7 +3,7 @@ import json
 import time
 from wtosbc import config
 from wtosbc.custom_types import *
-from typing import Optional, cast, Any
+from typing import Dict, Optional, cast, List, Tuple
 
 
 def login(session: Session) -> None:
@@ -28,16 +28,16 @@ def login(session: Session) -> None:
     print("Logged in")
 
 
-# Add a product to the cart
-def add_product(session: Session, data: Product) -> None:
+# Add an order item to the cart
+def add_order_item(session: Session, payload: Payload) -> None:
     response = session.post(
         "https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1",
         data={
-            "products_id": data["id"],
-            "id[1]": data["type_id"],
-            "quantity": data["qty"],
+            "products_id": payload["id"],
+            "id[1]": payload["type_id"],
+            "quantity": payload["quantity"],
             "ajaxCart": "1",
-            "_token": data["token"],
+            "_token": payload["token"],
         },
     )
 
@@ -106,14 +106,35 @@ def remove_product(session: Session, product_id: str, type_id: str) -> None:
     )
 
 
-# Add all orders to the cart
-# and add extra data
-def add_cart(
+def add_order_items(session: Session, order_items_per_user: OrderItemsPerUser) -> None:
+    for payload in get_payloads(order_items_per_user):
+        add_order_item(session, payload)
+    return None
+
+
+def get_payloads(order_items_per_user: OrderItemsPerUser) -> List[Payload]:
+    result: Dict[str, Payload] = {}
+    for order_items in order_items_per_user.values():
+        for order_item in order_items:
+            key = order_item["id"] + "-" + order_item["type_id"]
+
+            if key in result:
+                result[key]["quantity"] += order_item["qty"]
+            else:
+                result[key] = {
+                    "id": order_item["id"],
+                    "type_id": order_item["type_id"],
+                    "quantity": order_item["qty"],
+                    "token": order_item["token"],
+                }
+
+    return list(result.values())
+
+
+def get_order_items_per_user(
     session: Session, post_items_per_user: PostItemsPerUser
 ) -> OrderItemsPerUser:
     order_items_per_user: OrderItemsPerUser = {}
-    # TODO: map productsPerUser to productDataPerUser and move that part out of this function
-    # then call in this function add_product based on productDataPerUser
 
     for user, post_items in post_items_per_user.items():
         for pi, post_item in enumerate(post_items):
@@ -121,7 +142,6 @@ def add_cart(
                 document = get_document(session, post_item["url"])
                 product = get_product(document, post_item)
                 if product is not None:
-                    add_product(session, product)
 
                     if user not in order_items_per_user:
                         order_items_per_user[user] = []
@@ -138,6 +158,7 @@ def add_cart(
                         "pa": product["pa"],
                         "name": product["name"],
                         "type": product["type"],
+                        "token": product["token"],
                     }
                     order_items_per_user[user].append(order)
 
@@ -185,7 +206,7 @@ def clear_cart(session: Session) -> None:
         )
 
 
-def get_option(post_item_type: str, doc: Document) -> Any:
+def get_option(post_item_type: str, doc: Document) -> Tuple[str, float]:
     type_index = 0
     options = doc.cssselect("option[data-price]")
 
@@ -210,7 +231,7 @@ def get_option(post_item_type: str, doc: Document) -> Any:
         option.get("data-price")[0:-1].replace(",", ".")
     )  # remove last euro char
 
-    type_id = option.get("value")
+    type_id: str = option.get("value")
 
     return (type_id, price)
 

@@ -2,7 +2,8 @@ import json
 from snapshottest import assert_match_snapshot, Snapshot
 from typing import cast, Any
 from wtosbc.custom_types import Posts
-from wtosbc import wtos
+from wtosbc import wtos, config
+import pytest
 
 Snapshot = Any
 
@@ -28,7 +29,7 @@ def test_get_post_items_per_user_wtos_user() -> None:
         bc_number,
         [
             {
-                "display_name": "Rutger Nugteren",
+                "display_name": config.bc_chef,
                 "post_content": "BC150\nWTOS\n2x https://www.bike-components.de/en/Axa/RLC-100-Plug-In-Cable-Saddle-Bag-p54054/black-universal-o200001",
             }
         ],

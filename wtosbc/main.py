@@ -24,8 +24,11 @@ def go() -> None:
         bc.clear_cart(session)
         print("Cart cleared")
 
-        order_items_per_user = bc.add_cart(session, post_items_per_user)
-        print("Orders added to cart")
+        order_items_per_user = bc.get_order_items_per_user(session, post_items_per_user)
+        print("Order items data fetched")
+
+        bc.add_order_items(session, order_items_per_user)
+        print("Order items added to the cart")
 
         bc.add_pa(session, order_items_per_user)
         print("Price alerts added")
