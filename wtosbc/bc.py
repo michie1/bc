@@ -206,7 +206,7 @@ def clear_cart(session: Session) -> None:
         )
 
 
-def get_option(post_item_type: str, doc: Document) -> Tuple[str, float]:
+def get_option(post_item_type: str, doc: Document) -> Tuple[str, float, str]:
     type_index = 0
     options = doc.cssselect("option[data-price]")
 
@@ -219,10 +219,9 @@ def get_option(post_item_type: str, doc: Document) -> Tuple[str, float]:
 
         # Originally we had to remove the last character, but BC changed something
         # so now we do two comparisons, with and without the last character.
-        while (
-            post_item_type != option_type_name[0:-1]
-            and post_item_type != option_type_name
-        ):
+        while post_item_type != remove_chars(option_type_name)[
+            0:-1
+        ] and post_item_type != remove_chars(option_type_name):
             type_index += 1
             option = options[type_index]
             option_type_name = get_option_type_name(option.text_content())
@@ -233,7 +232,7 @@ def get_option(post_item_type: str, doc: Document) -> Tuple[str, float]:
 
     type_id: str = option.get("value")
 
-    return (type_id, price)
+    return (type_id, price, option_type_name)
 
 
 def get_option_type_name(text_content: str) -> str:
@@ -247,14 +246,16 @@ def get_document(session: Session, url: str) -> Document:
 
 def get_product(document: Document, post_item: PostItem) -> Optional[Product]:
     try:
-        (type_id, price) = get_option(post_item["type"], document)
+        (type_id, price, product_type) = get_option(
+            remove_chars(post_item["type"]), document
+        )
 
         return {
             "id": get_product_id(document),
             "name": get_product_name(document.cssselect("title")[0].text),
             "qty": post_item["qty"],
             "pa": post_item["pa"],
-            "type": post_item["type"],
+            "type": product_type,
             "price": price,
             "type_id": type_id,
             "token": get_product_token(document),
@@ -280,3 +281,7 @@ def get_product_name(title: str) -> str:
         .replace("buy online", "")
         .replace("online kaufen", "")
     )
+
+
+def remove_chars(value: str) -> str:
+    return value.replace('"', "").replace("″", "").replace(" ", "").replace("'", "")
