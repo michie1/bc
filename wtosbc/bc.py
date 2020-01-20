@@ -284,4 +284,10 @@ def get_product_name(title: str) -> str:
 
 
 def remove_chars(value: str) -> str:
-    return value.replace('"', "").replace("″", "").replace(" ", "").replace("'", "")
+    return (
+        value.replace('"', "")
+        .replace("″", "")
+        .replace(" ", "")
+        .replace("'", "")
+        .lower()
+    )
