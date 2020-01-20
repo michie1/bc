@@ -12,7 +12,7 @@ Snapshot = Any
 def test_get_product(snapshot: Snapshot) -> None:
     post_item: PostItem = {
         "url": "tests/product_page.html",
-        "type": "silver-black/140 mm",
+        "type": "silver-black/140 \" ″'MM",
         "qty": 1,
         "pa": "",
     }

@@ -38,7 +38,7 @@ def get_post_items_per_user(bc_number: int, posts: Posts) -> PostItemsPerUser:
 
         if content[2:11] == str(bc_number) + " start":  # current start
             print("start")
-        elif content[2:5] == str(bc_number):  # BC123
+        elif without_spaces(content)[2:5] == str(bc_number):  # BC123
             extract_post_items(content, user, post_items_per_user)
         elif is_next_start_post(post, bc_number, bc_chef):
             break
@@ -145,3 +145,7 @@ def split_type_pa(type_pa: str) -> Tuple[str, str]:
             product_pa = bold_splits[1].replace("[/b]", "").strip()
 
     return (product_type, product_pa)
+
+
+def without_spaces(content: str) -> str:
+    return content.replace(" ", "")
