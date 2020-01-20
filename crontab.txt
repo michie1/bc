@@ -1,1 +1,2 @@
 0 * * * * date >> /src/log.txt && cd /src && /usr/local/bin/python wtosbc/main.py >> log.txt && curl https://hc-ping.com/f6721993-ce86-4538-a65a-834fcc18c796 > /dev/null
+* * * * * cd /src && bash run_hook.sh >> log.txt 2>&1
