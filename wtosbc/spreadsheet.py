@@ -72,7 +72,7 @@ def get_cells(orders: OrderItemsPerUser) -> Cells:
     cells[6] = "Prijs per stuk"
     cells[7] = "Aantal"
     cells[8] = "Totaal"
-    cells[9] = "5% (mits geen PA)"
+    cells[9] = "5%"
     row_number += 1
 
     summary = []
@@ -113,13 +113,7 @@ def get_cells(orders: OrderItemsPerUser) -> Cells:
                     "=G" + str(row_number + 1) + "*H" + str(row_number + 1)
                 )
                 cells[row_number * 10 + 9] = (
-                    "=CEILING(IF(LEN(E"
-                    + str(row_number + 1)
-                    + ")=8,I"
-                    + str(row_number + 1)
-                    + ",0.95*I"
-                    + str(row_number + 1)
-                    + "),0.01)"
+                    "=CEILING(0.95*I" + str(row_number + 1) + ",0.01)"
                 )
                 row_number += 1
 
