@@ -172,24 +172,6 @@ def read_state() -> State:
         return cast(State, data)
 
 
-def remove_cart(session: Session, order_items_per_user: OrderItemsPerUser) -> None:
-    state = read_state()
-    for user, order_items in order_items_per_user.items():
-        for pi, order_item in enumerate(order_items):
-            if order_item is not None:
-                # Remove price alert product from basket if state is not pa
-                if (not state["pa"] and order_item["pa"] != "") or (
-                    state["pa"] and order_item["pa"] == ""
-                ):
-                    print(
-                        "Remove product ",
-                        order_item["id"],
-                        order_item["type_id"],
-                        state["pa"],
-                    )
-                    remove_product(session, order_item["id"], order_item["type_id"])
-
-
 def clear_cart(session: Session) -> None:
     # Get cart
     document = get_document(session, "https://www.bike-components.de/shopping_cart.php")

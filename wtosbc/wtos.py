@@ -42,11 +42,6 @@ def get_post_items_per_user(bc_number: int, posts: Posts) -> PostItemsPerUser:
             extract_post_items(content, user, post_items_per_user)
         elif is_next_start_post(post, bc_number, bc_chef):
             break
-        elif content[2:11] == str(bc_number + 1) + " PA":  # next start
-            # TODO: Check if you can do this outside this function
-            if user == bc_chef:
-                state.enable_pa_state()
-                break
 
     return post_items_per_user
 
