@@ -33,10 +33,6 @@ def go() -> None:
         bc.add_pa(session, order_items_per_user)
         print("Price alerts added")
 
-        # Remove PA/NON-PA items from cart
-        bc.remove_cart(session, order_items_per_user)
-        print("Items from cart removed")
-
         bc_spreadsheet = spreadsheet.load(bc_number)
         print("Spreadsheet loaded")
 
@@ -53,7 +49,6 @@ def go() -> None:
 
 def start_next_order(next_bc_number: int) -> None:
     state.set_bc_number(next_bc_number)
-    state.disable_pa_state()
     spreadsheet.create_sheet(next_bc_number)
 
 
