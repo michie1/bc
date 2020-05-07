@@ -177,16 +177,16 @@ def clear_cart(session: Session) -> None:
     document = get_document(session, "https://www.bike-components.de/en/cart/")
     token = document.cssselect("body")[0].get("data-csrf-token")
 
-    r = session.post(
+    response = session.post(
         "https://www.bike-components.de/de/api/v1/cart/NL/",
         data={"action": "list", "token": token,},
     )
-    items = r.json()["items"]
+    items = response.json()["items"]
     if len(items) == 0:
         print("No items in cart")
 
     for item in items:
-        r = session.post(
+        session.post(
             "https://www.bike-components.de/de/api/v1/cart/NL/",
             data={"action": "delete", "token": token, "option": item["id"]},
         )
