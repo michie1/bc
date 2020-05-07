@@ -30,14 +30,14 @@ def login(session: Session) -> None:
 
 # Add an order item to the cart
 def add_order_item(session: Session, payload: Payload) -> None:
+
     response = session.post(
-        "https://www.bike-components.de/callback/cart_product_add.php?ajaxCart=1",
+        "https://www.bike-components.de/en/api/v1/cart/NL/",
         data={
-            "products_id": payload["id"],
-            "id[1]": payload["type_id"],
+            "action": "add",
+            "token": payload["token"],
+            "option": payload["type_id"],
             "quantity": payload["quantity"],
-            "ajaxCart": "1",
-            "_token": payload["token"],
         },
     )
 
@@ -174,17 +174,21 @@ def read_state() -> State:
 
 def clear_cart(session: Session) -> None:
     # Get cart
-    document = get_document(session, "https://www.bike-components.de/shopping_cart.php")
+    document = get_document(session, "https://www.bike-components.de/en/cart/")
     token = document.cssselect("body")[0].get("data-csrf-token")
 
-    for product in document.cssselect('input[name="products_id[]"]'):
-        session.post(
-            "https://www.bike-components.de/callback/cart_update.php",
-            data={
-                "cart_delete[]": product.get("value"),
-                "products_id[]products_id": product.get("value"),
-                "_token": token,
-            },
+    r = session.post(
+        "https://www.bike-components.de/de/api/v1/cart/NL/",
+        data={"action": "list", "token": token,},
+    )
+    items = r.json()["items"]
+    if len(items) == 0:
+        print("No items in cart")
+
+    for item in items:
+        r = session.post(
+            "https://www.bike-components.de/de/api/v1/cart/NL/",
+            data={"action": "delete", "token": token, "option": item["id"]},
         )
 
 
@@ -250,7 +254,7 @@ def get_product(document: Document, post_item: PostItem) -> Optional[Product]:
 
 
 def get_product_id(document: Document) -> str:
-    return cast(str, document.cssselect('input[name="products_id"]')[0].get("value"))
+    return cast(str, document.cssselect("div.product-id>span")[0].text.strip())
 
 
 def get_product_token(document: Document) -> str:
