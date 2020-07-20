@@ -154,6 +154,8 @@ def get_cells(orders: OrderItemsPerUser) -> Cells:
     cells[row_number * 10] = "Met porto"
     cells[row_number * 10 + 1] = "=B" + str((row_number)) + "+5.95"
     row_number += 1
+    row_number += 1
+    cells[row_number * 10] = "Automatisch gegenereerd door https://msvos.nl"
 
     return cells
 
